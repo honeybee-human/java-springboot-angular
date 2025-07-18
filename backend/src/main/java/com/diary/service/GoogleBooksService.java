@@ -1,17 +1,15 @@
 package com.diary.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.diary.model.Book;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.diary.model.Book;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class GoogleBooksService {
@@ -24,91 +22,41 @@ public class GoogleBooksService {
     
     private static final List<String> WELLNESS_SUBJECTS = Arrays.asList(
         "psychology", "productivity", "personal development", 
-        "mental health", "wellness", "motivation", "self-help",
-        "mindfulness", "meditation", "stress management", "life coaching",
-        "positive psychology", "emotional intelligence", "resilience"
+        "mental health", "wellness", "motivation"
     );
     
-    // Add pagination support
     public List<Book> searchBooks(String query, String subject, int page, int size) {
         try {
             String searchQuery = buildSearchQuery(query, subject);
             int startIndex = page * size;
-            String url = "https://www.googleapis.com/books/v1/volumes?q=" + searchQuery + 
-                        "&maxResults=" + size + "&startIndex=" + startIndex;
+            String url = "https://www.googleapis.com/books/v1/volumes?q=" + searchQuery 
+                       + "&maxResults=" + size + "&startIndex=" + startIndex;
             
             if (!apiKey.isEmpty()) {
                 url += "&key=" + apiKey;
             }
             
             String response = restTemplate.getForObject(url, String.class);
-            List<Book> books = parseGoogleBooksResponse(response);
-            
-            // Filter books to only include wellness-related categories
-            return filterWellnessBooks(books);
+            return parseGoogleBooksResponse(response);
         } catch (Exception e) {
             throw new RuntimeException("Error searching books: " + e.getMessage());
         }
     }
     
-    // Keep the old method for backward compatibility
-    public List<Book> searchBooks(String query, String subject) {
-        return searchBooks(query, subject, 0, 20);
-    }
-    
-    private List<Book> filterWellnessBooks(List<Book> books) {
-        return books.stream()
-            .filter(book -> {
-                if (book.getCategories() == null || book.getCategories().isEmpty()) {
-                    return false;
-                }
-                
-                // Check if any category matches wellness subjects
-                return book.getCategories().stream()
-                    .anyMatch(category -> 
-                        WELLNESS_SUBJECTS.stream()
-                            .anyMatch(subject -> 
-                                category.toLowerCase().contains(subject.toLowerCase()) ||
-                                subject.toLowerCase().contains(category.toLowerCase())
-                            )
-                    );
-            })
-            .collect(Collectors.toList());
-    }
-    
-    // Add method to get all wellness books without search query
-    public List<Book> getAllWellnessBooks(int page, int size) {
+    public List<Book> getPopularBooks(int page, int size) {
         try {
-            // Search for each wellness subject and combine results
-            List<Book> allBooks = new ArrayList<>();
+            int startIndex = page * size;
+            String url = "https://www.googleapis.com/books/v1/volumes?q=subject:self-help+OR+subject:motivation+OR+subject:psychology"
+                       + "&orderBy=relevance&maxResults=" + size + "&startIndex=" + startIndex;
             
-            for (String subject : WELLNESS_SUBJECTS) {
-                int startIndex = page * size;
-                String url = "https://www.googleapis.com/books/v1/volumes?q=subject:" + subject + 
-                            "&maxResults=" + Math.min(size / WELLNESS_SUBJECTS.size() + 1, 10) + 
-                            "&startIndex=" + startIndex;
-                
-                if (!apiKey.isEmpty()) {
-                    url += "&key=" + apiKey;
-                }
-                
-                try {
-                    String response = restTemplate.getForObject(url, String.class);
-                    List<Book> books = parseGoogleBooksResponse(response);
-                    allBooks.addAll(filterWellnessBooks(books));
-                } catch (Exception e) {
-                    // Continue with other subjects if one fails
-                    continue;
-                }
+            if (!apiKey.isEmpty()) {
+                url += "&key=" + apiKey;
             }
             
-            // Remove duplicates and limit results
-            return allBooks.stream()
-                .distinct()
-                .limit(size)
-                .collect(Collectors.toList());
+            String response = restTemplate.getForObject(url, String.class);
+            return parseGoogleBooksResponse(response);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching wellness books: " + e.getMessage());
+            throw new RuntimeException("Error fetching popular books: " + e.getMessage());
         }
     }
     
@@ -199,42 +147,5 @@ public class GoogleBooksService {
     
     public List<String> getWellnessSubjects() {
         return WELLNESS_SUBJECTS;
-    }
-    
-    // Add new method to search all books without filtering
-    public List<Book> searchAllBooks(String query, String subject, int page, int size) {
-        try {
-            String searchQuery = buildSearchQuery(query, subject);
-            int startIndex = page * size;
-            String url = "https://www.googleapis.com/books/v1/volumes?q=" + searchQuery + 
-                        "&maxResults=" + size + "&startIndex=" + startIndex;
-            
-            if (!apiKey.isEmpty()) {
-                url += "&key=" + apiKey;
-            }
-            
-            String response = restTemplate.getForObject(url, String.class);
-            return parseGoogleBooksResponse(response); // No filtering
-        } catch (Exception e) {
-            throw new RuntimeException("Error searching books: " + e.getMessage());
-        }
-    }
-    
-    // Add method to get all books without wellness filtering
-    public List<Book> getAllBooks(int page, int size) {
-        try {
-            int startIndex = page * size;
-            // Search for popular/recent books instead of wellness-specific
-            String url = "https://www.googleapis.com/books/v1/volumes?q=*&orderBy=newest&maxResults=" + size + "&startIndex=" + startIndex;
-            
-            if (!apiKey.isEmpty()) {
-                url += "&key=" + apiKey;
-            }
-            
-            String response = restTemplate.getForObject(url, String.class);
-            return parseGoogleBooksResponse(response); // No filtering
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching books: " + e.getMessage());
-        }
     }
 }

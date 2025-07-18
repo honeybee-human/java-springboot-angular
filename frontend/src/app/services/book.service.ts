@@ -17,9 +17,9 @@ export class BookService {
     if (subject) params += `&subject=${encodeURIComponent(subject)}`;
     return this.http.get<Book[]>(`${this.apiUrl}/search?${params}`);
   }
-  
-  getAllWellnessBooks(page: number = 0, size: number = 20): Observable<Book[]> {
-    return this.http.get<Book[]>(`${this.apiUrl}/wellness?page=${page}&size=${size}`);
+
+  getPopularBooks(page: number = 0, size: number = 20): Observable<Book[]> {
+    return this.http.get<Book[]>(`${this.apiUrl}/popular?page=${page}&size=${size}`);
   }
 
   saveBook(book: Book): Observable<Book> {

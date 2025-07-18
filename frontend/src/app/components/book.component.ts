@@ -39,7 +39,7 @@ import { Book } from '../models/book.model';
           class="tab-btn" 
           [class.active]="activeTab === 'search'"
           (click)="setActiveTab('search')">
-          🔍 Search Results ({{ searchResults.length }})
+          🔍 Search Results ({{ displayedSearchResults.length }})
         </button>
         <button 
           class="tab-btn" 
@@ -57,14 +57,7 @@ import { Book } from '../models/book.model';
 
       <!-- Search Results Tab -->
       <div *ngIf="activeTab === 'search'" class="tab-content">
-        <!-- Show loading state -->
-        <div *ngIf="isSearching" class="loading">
-          <div class="loading-icon">🔍</div>
-          <p>Searching for books...</p>
-        </div>
-        
-        <!-- Show empty state only when search fails after user searched -->
-        <div *ngIf="searchResults.length === 0 && !isSearching && hasSearched && (searchQuery.trim() || selectedSubject)" class="empty-state">
+        <div *ngIf="displayedSearchResults.length === 0 && !isSearching && hasSearched" class="empty-state">
           <div class="empty-icon">📭</div>
           <h3>Cannot Currently Find Books</h3>
           <p>We couldn't find any books matching your search criteria.</p>
@@ -80,31 +73,14 @@ import { Book } from '../models/book.model';
           </button>
         </div>
         
-        <!-- Show initial empty state when no search has been performed -->
-        <div *ngIf="searchResults.length === 0 && !isSearching && !hasSearched" class="empty-state">
-          <div class="empty-icon">🔍</div>
-          <h3>Discover Motivational Books</h3>
-          <p>Loading available books for you...</p>
-        </div>
-        
-        <!-- Show API failure state when initial load fails -->
-        <div *ngIf="searchResults.length === 0 && !isSearching && hasSearched && !searchQuery.trim() && !selectedSubject" class="empty-state">
+        <div *ngIf="!hasSearched && !isSearching" class="empty-state">
           <div class="empty-icon">📚</div>
-          <h3>Welcome to Your Motivational Library</h3>
-          <p>We're having trouble loading books right now. This might be due to:</p>
-          <ul class="empty-reasons">
-            <li>No API key configured</li>
-            <li>Network connectivity issues</li>
-          </ul>
-          <p>Try the <strong>Practice Books</strong> tab to explore sample motivational books!</p>
-          <button (click)="setActiveTab('practice')" class="practice-btn">
-            🎯 View Practice Books
-          </button>
+          <h3>Discover Motivational Books</h3>
+          <p>Popular motivational books are loaded automatically. Use the search above to find specific books!</p>
         </div>
 
-        <!-- Show books grid -->
-        <div *ngIf="searchResults.length > 0" class="books-grid">
-          <div *ngFor="let book of searchResults" class="book-card">
+        <div class="books-grid">
+          <div *ngFor="let book of displayedSearchResults" class="book-card">
             <div class="book-image">
               <img [src]="book.thumbnail || getPlaceholderImage()" 
                    [alt]="book.title" 
@@ -156,13 +132,6 @@ import { Book } from '../models/book.model';
               </a>
             </div>
           </div>
-        </div>
-        
-        <!-- Load More button -->
-        <div *ngIf="searchResults.length > 0 && hasMoreResults" class="load-more-container">
-          <button (click)="loadMoreBooks()" [disabled]="isLoadingMore" class="load-more-btn">
-            {{ isLoadingMore ? 'Loading...' : 'Load More Books' }}
-          </button>
         </div>
       </div>
 
@@ -287,17 +256,6 @@ import { Book } from '../models/book.model';
             </div>
           </div>
         </div>
-      </div>
-      <!-- Add after the books grid in search results -->
-      <div *ngIf="searchResults.length > 0" class="pagination-section">
-        <button 
-          *ngIf="hasMoreResults" 
-          (click)="loadMoreBooks()" 
-          class="load-more-btn"
-          [disabled]="isLoadingMore">
-          {{ isLoadingMore ? '📖 Loading More...' : '📚 Load More Books' }}
-        </button>
-        <p class="results-info">Showing {{ searchResults.length }} wellness-focused books</p>
       </div>
     </div>
   `,
@@ -675,11 +633,11 @@ export class BookComponent implements OnInit {
   isLoadingCollection = false;
   hasSearched = false;
   
-  // Add these missing pagination properties:
+  // Add missing pagination properties
   currentPage = 0;
-  pageSize = 10;
+  pageSize = 20;
   isLoadingMore = false;
-  hasMoreResults = false;
+  hasMoreResults = true;
   
   fakeBooks: Book[] = [
     {
@@ -770,6 +728,19 @@ export class BookComponent implements OnInit {
 
   constructor(private bookService: BookService) {}
 
+  ngOnInit() {
+    this.loadWellnessSubjects();
+    // Temporarily comment out API call and show practice books
+    // this.loadPopularBooks();
+    this.activeTab = 'practice';
+  }
+
+  // Add missing getter method
+  get displayedSearchResults(): Book[] {
+    return this.searchResults.length > 0 ? this.searchResults : [];
+  }
+
+  // Add missing loadWellnessSubjects method
   loadWellnessSubjects() {
     this.bookService.getWellnessSubjects().subscribe({
       next: (subjects) => {
@@ -777,77 +748,80 @@ export class BookComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading wellness subjects:', error);
+        // Fallback subjects if API fails
+        this.wellnessSubjects = ['psychology', 'productivity', 'personal development', 'mental health', 'wellness', 'motivation'];
       }
     });
   }
 
-  ngOnInit() {
-    this.loadWellnessSubjects();
-    this.loadAllWellnessBooks(); // Load wellness books on start
-  }
-
-  loadAllWellnessBooks() {
+  loadPopularBooks() {
     this.isSearching = true;
-    this.bookService.getAllWellnessBooks(0, this.pageSize).subscribe({
+    this.hasSearched = true;
+    
+    // Temporarily use the old search method without pagination
+    this.bookService.searchBooks('motivation', '', 0, this.pageSize).subscribe({
       next: (books) => {
         this.searchResults = books;
-        this.isSearching = false;
-        this.hasSearched = true;
         this.currentPage = 0;
         this.hasMoreResults = books.length === this.pageSize;
+        this.isSearching = false;
         this.checkSavedStatus();
       },
       error: (error) => {
-        console.error('Error loading wellness books:', error);
+        console.error('Error loading popular books:', error);
         this.searchResults = [];
         this.isSearching = false;
+        this.hasMoreResults = false;
       }
     });
   }
-  
+
   searchBooks() {
     this.currentPage = 0;
-    this.isSearching = true;
+    this.searchResults = [];
+    this.performSearch();
+  }
+
+  performSearch() {
+    if (!this.searchQuery.trim() && !this.selectedSubject && this.currentPage === 0) {
+      this.loadPopularBooks();
+      return;
+    }
+
+    this.isSearching = this.currentPage === 0;
+    this.isLoadingMore = this.currentPage > 0;
     this.hasSearched = true;
 
     this.bookService.searchBooks(this.searchQuery, this.selectedSubject, this.currentPage, this.pageSize).subscribe({
       next: (books) => {
-        this.searchResults = books;
-        this.isSearching = false;
+        if (this.currentPage === 0) {
+          this.searchResults = books;
+        } else {
+          this.searchResults = [...this.searchResults, ...books];
+        }
+        
         this.hasMoreResults = books.length === this.pageSize;
+        this.isSearching = false;
+        this.isLoadingMore = false;
         this.checkSavedStatus();
       },
       error: (error) => {
         console.error('Error searching books:', error);
-        this.searchResults = [];
+        if (this.currentPage === 0) {
+          this.searchResults = [];
+        }
         this.isSearching = false;
+        this.isLoadingMore = false;
+        this.hasMoreResults = false;
       }
     });
   }
-  
+
   loadMoreBooks() {
-    if (this.isLoadingMore || !this.hasMoreResults) return;
-    
-    this.isLoadingMore = true;
-    this.currentPage++;
-    
-    const searchCall = this.searchQuery.trim() || this.selectedSubject ? 
-      this.bookService.searchBooks(this.searchQuery, this.selectedSubject, this.currentPage, this.pageSize) :
-      this.bookService.getAllWellnessBooks(this.currentPage, this.pageSize);
-    
-    searchCall.subscribe({
-      next: (books) => {
-        this.searchResults = [...this.searchResults, ...books];
-        this.isLoadingMore = false;
-        this.hasMoreResults = books.length === this.pageSize;
-        this.checkSavedStatus();
-      },
-      error: (error) => {
-        console.error('Error loading more books:', error);
-        this.isLoadingMore = false;
-        this.currentPage--; // Revert page increment
-      }
-    });
+    if (this.hasMoreResults && !this.isLoadingMore) {
+      this.currentPage++;
+      this.performSearch();
+    }
   }
 
   saveBook(book: Book) {

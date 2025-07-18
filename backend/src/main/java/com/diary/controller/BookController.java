@@ -25,18 +25,11 @@ public class BookController {
         return bookService.searchBooks(q, subject, page, size);
     }
     
-    @GetMapping("/wellness")
-    public List<Book> getAllWellnessBooks(
+    @GetMapping("/popular")
+    public List<Book> getPopularBooks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return bookService.getAllWellnessBooks(page, size);
-    }
-    
-    @GetMapping("/all")
-    public List<Book> getAllBooks(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return bookService.getAllBooks(page, size);
+        return bookService.getPopularBooks(page, size);
     }
     
     @PostMapping("/save")

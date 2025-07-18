@@ -17,25 +17,14 @@ public class BookService {
     @Autowired
     private GoogleBooksService googleBooksService;
     
+    // Updated to accept pagination parameters
     public List<Book> searchBooks(String query, String subject, int page, int size) {
-        if (query == null || query.trim().isEmpty()) {
-            // If no search query, return all books
-            return googleBooksService.getAllBooks(page, size);
-        }
-        return googleBooksService.searchAllBooks(query, subject, page, size);
+        return googleBooksService.searchBooks(query, subject, page, size);
     }
     
-    public List<Book> getAllBooks(int page, int size) {
-        return googleBooksService.getAllBooks(page, size);
-    }
-    
-    // Keep backward compatibility
-    public List<Book> searchBooks(String query, String subject) {
-        return searchBooks(query, subject, 0, 20);
-    }
-    
-    public List<Book> getAllWellnessBooks(int page, int size) {
-        return googleBooksService.getAllWellnessBooks(page, size);
+    // Add the missing getPopularBooks method
+    public List<Book> getPopularBooks(int page, int size) {
+        return googleBooksService.getPopularBooks(page, size);
     }
     
     public Book saveBook(Book book) {
