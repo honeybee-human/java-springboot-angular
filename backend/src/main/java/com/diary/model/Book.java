@@ -72,6 +72,11 @@ public class Book {
     public Integer getRatingsCount() { return ratingsCount; }
     public void setRatingsCount(Integer ratingsCount) { this.ratingsCount = ratingsCount; }
     
-    public Boolean getIsSaved() { return isSaved; }
-    public void setIsSaved(Boolean isSaved) { this.isSaved = isSaved; }
+    public Boolean getIsSaved() { 
+        return isSaved != null ? isSaved : false; 
+    }
+    
+    public void setIsSaved(Boolean isSaved) { 
+        this.isSaved = isSaved != null ? isSaved : false; 
+    }
 }

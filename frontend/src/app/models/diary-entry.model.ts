@@ -1,9 +1,12 @@
+import { Book } from './book.model';
+
 export interface DiaryEntry {
   id?: number;
   title: string;
   content: string;
   mood: Mood;
   tags: string[];
+  associatedBook?: Book;
   createdAt?: Date;
   updatedAt?: Date;
 }

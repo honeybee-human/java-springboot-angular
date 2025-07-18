@@ -46,4 +46,15 @@ export class DiaryService {
   getAllMoods(): Observable<Mood[]> {
     return this.http.get<Mood[]>(`${this.apiUrl}/moods`);
   }
+
+  searchByTextAndMood(searchTerm: string, mood: Mood | null): Observable<DiaryEntry[]> {
+    let params = new URLSearchParams();
+    if (searchTerm) {
+      params.append('text', searchTerm);
+    }
+    if (mood) {
+      params.append('mood', mood);
+    }
+    return this.http.get<DiaryEntry[]>(`${this.apiUrl}/search/advanced?${params.toString()}`);
+  }
 }

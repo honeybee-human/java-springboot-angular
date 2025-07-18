@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DiaryEntry, Mood, MoodDisplayInfo, MoodDisplay } from '../models/diary-entry.model';
+import { Book } from '../models/book.model';
 import { DiaryService } from '../services/diary.service';
+import { BookService } from '../services/book.service';
 
 @Component({
   selector: 'app-diary',
@@ -13,8 +15,21 @@ export class DiaryComponent implements OnInit {
   loading = false;
   showAddForm = false;
   editingEntry: DiaryEntry | null = null;
+  
+  // Enhanced search properties
   searchQuery = '';
-  filterMood = '';
+  titleSearchQuery = '';
+  textSearchQuery = '';
+  filterMood: Mood | null = null; // Changed from string to Mood | null
+  
+  // Book search properties
+  showBookSearch = false;
+  bookSearchResults: Book[] = [];
+  savedBooks: Book[] = [];
+  bookSearchQuery = '';
+  bookTitleQuery = '';
+  bookAuthorQuery = '';
+  isSearchingBooks = false;
   
   currentEntry: DiaryEntry = {
     title: '',
@@ -25,10 +40,14 @@ export class DiaryComponent implements OnInit {
   
   tagsString = '';
 
-  constructor(private diaryService: DiaryService) {}
+  constructor(
+    private diaryService: DiaryService,
+    private bookService: BookService
+  ) {}
 
   ngOnInit() {
     this.loadEntries();
+    this.loadSavedBooks();
   }
 
   loadEntries() {
@@ -45,14 +64,25 @@ export class DiaryComponent implements OnInit {
     });
   }
 
+  loadSavedBooks() {
+    this.bookService.getSavedBooks().subscribe({
+      next: (books) => {
+        this.savedBooks = books;
+      },
+      error: (error) => {
+        console.error('Error loading saved books:', error);
+      }
+    });
+  }
+
   saveEntry() {
-    this.currentEntry.tags = this.tagsString
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
+    const entry = {
+      ...this.currentEntry,
+      tags: this.tagsString.split(',').map(tag => tag.trim()).filter(tag => tag)
+    };
 
     if (this.editingEntry) {
-      this.diaryService.updateEntry(this.editingEntry.id!, this.currentEntry).subscribe({
+      this.diaryService.updateEntry(this.editingEntry.id!, entry).subscribe({
         next: (updatedEntry) => {
           const index = this.entries.findIndex(e => e.id === updatedEntry.id);
           if (index !== -1) {
@@ -65,7 +95,7 @@ export class DiaryComponent implements OnInit {
         }
       });
     } else {
-      this.diaryService.createEntry(this.currentEntry).subscribe({
+      this.diaryService.createEntry(entry).subscribe({
         next: (newEntry) => {
           this.entries.unshift(newEntry);
           this.cancelEdit();
@@ -107,8 +137,10 @@ export class DiaryComponent implements OnInit {
       tags: []
     };
     this.tagsString = '';
+    this.showBookSearch = false;
   }
 
+  // Enhanced search methods
   onSearch() {
     if (this.searchQuery.trim()) {
       this.diaryService.searchEntries(this.searchQuery).subscribe({
@@ -124,9 +156,28 @@ export class DiaryComponent implements OnInit {
     }
   }
 
+  onAdvancedSearch() {
+    // Implement advanced search combining title, text, and mood
+    const searchTerm = this.titleSearchQuery || this.textSearchQuery || '';
+    const mood = this.filterMood; // No need for || null since it's already Mood | null
+    
+    if (searchTerm.trim() || mood) {
+      this.diaryService.searchByTextAndMood(searchTerm, mood).subscribe({
+        next: (entries: DiaryEntry[]) => {
+          this.entries = entries;
+        },
+        error: (error: any) => {
+          console.error('Error in advanced search:', error);
+        }
+      });
+    } else {
+      this.loadEntries();
+    }
+  }
+
   onMoodFilter() {
     if (this.filterMood) {
-      this.diaryService.getEntriesByMood(this.filterMood as Mood).subscribe({
+      this.diaryService.getEntriesByMood(this.filterMood).subscribe({ // No need for 'as Mood' cast
         next: (entries) => {
           this.entries = entries;
         },
@@ -137,6 +188,51 @@ export class DiaryComponent implements OnInit {
     } else {
       this.loadEntries();
     }
+  }
+
+  // Book search methods
+  toggleBookSearch() {
+    this.showBookSearch = !this.showBookSearch;
+    if (this.showBookSearch) {
+      this.loadSavedBooks();
+    }
+  }
+
+  searchBooks() {
+    if (!this.bookSearchQuery.trim() && !this.bookTitleQuery.trim() && !this.bookAuthorQuery.trim()) {
+      return;
+    }
+
+    this.isSearchingBooks = true;
+    this.bookService.searchBooksAdvanced(
+      this.bookSearchQuery,
+      this.bookTitleQuery,
+      this.bookAuthorQuery,
+      0,
+      20
+    ).subscribe({
+      next: (books) => {
+        this.bookSearchResults = books;
+        this.isSearchingBooks = false;
+      },
+      error: (error) => {
+        console.error('Error searching books:', error);
+        this.isSearchingBooks = false;
+      }
+    });
+  }
+
+  selectBook(book: Book) {
+    this.currentEntry.associatedBook = book;
+    this.showBookSearch = false;
+  }
+
+  selectSavedBook(book: Book) {
+    this.currentEntry.associatedBook = book;
+  }
+
+  removeSelectedBook() {
+    this.currentEntry.associatedBook = undefined;
   }
 
   getMoodDisplay(mood: Mood): MoodDisplayInfo {
@@ -152,5 +248,10 @@ export class DiaryComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  truncateDescription(description: string, maxLength: number = 100): string {
+    if (!description) return '';
+    return description.length > maxLength ? description.substring(0, maxLength) + '...' : description;
   }
 }

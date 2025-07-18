@@ -24,4 +24,14 @@ public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Long> {
     List<DiaryEntry> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     
     List<DiaryEntry> findAllByOrderByCreatedAtDesc();
+    
+    // New methods for book-related searches
+    @Query("SELECT d FROM DiaryEntry d WHERE d.associatedBook.title LIKE %:bookTitle%")
+    List<DiaryEntry> findByBookTitle(@Param("bookTitle") String bookTitle);
+    
+    @Query("SELECT d FROM DiaryEntry d WHERE d.associatedBook IS NOT NULL")
+    List<DiaryEntry> findEntriesWithBooks();
+    
+    @Query("SELECT d FROM DiaryEntry d WHERE (d.title LIKE %:searchTerm% OR d.content LIKE %:searchTerm% OR d.associatedBook.title LIKE %:searchTerm%) AND (:mood IS NULL OR d.mood = :mood)")
+    List<DiaryEntry> findByTextAndMood(@Param("searchTerm") String searchTerm, @Param("mood") Mood mood);
 }

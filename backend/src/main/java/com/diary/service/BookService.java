@@ -4,8 +4,10 @@ import com.diary.model.Book;
 import com.diary.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -25,15 +27,33 @@ public class BookService {
     }
     
     public Book saveBook(Book book) {
-        return bookRepository.save(book);
+        // Check if book already exists
+        Optional<Book> existingBook = bookRepository.findByGoogleBooksId(book.getGoogleBooksId());
+        
+        if (existingBook.isPresent()) {
+            // Update existing book to mark as saved
+            Book existing = existingBook.get();
+            existing.setIsSaved(true);
+            return bookRepository.save(existing);
+        } else {
+            // Save new book
+            book.setIsSaved(true);
+            return bookRepository.save(book);
+        }
     }
     
     public List<Book> getSavedBooks() {
-        return bookRepository.findAll();
+        return bookRepository.findByIsSavedTrue();
     }
     
+    @Transactional
     public void removeFromCollection(String googleBooksId) {
-        bookRepository.deleteByGoogleBooksId(googleBooksId);
+        Optional<Book> book = bookRepository.findByGoogleBooksId(googleBooksId);
+        if (book.isPresent()) {
+            Book existingBook = book.get();
+            existingBook.setIsSaved(false);
+            bookRepository.save(existingBook);
+        }
     }
     
     public List<String> getWellnessSubjects() {
