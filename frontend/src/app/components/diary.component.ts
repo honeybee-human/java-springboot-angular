@@ -24,6 +24,7 @@ export class DiaryComponent implements OnInit {
   
   // Book search properties
   showBookSearch = false;
+  showBookModal = false; // Add this new property
   bookSearchResults: Book[] = [];
   savedBooks: Book[] = [];
   bookSearchQuery = '';
@@ -250,8 +251,58 @@ export class DiaryComponent implements OnInit {
     });
   }
 
-  truncateDescription(description: string, maxLength: number = 100): string {
+  // Add helper methods for book display
+  getAuthorDisplay(authors: string[] | undefined): string {
+    if (!authors || authors.length === 0) {
+      return 'Unknown Author';
+    }
+    
+    if (authors.length === 1) {
+      return `by ${authors[0]}`;
+    }
+    
+    if (authors.length === 2) {
+      return `by ${authors[0]} and ${authors[1]}`;
+    }
+    
+    // For more than 2 authors, show first two + count
+    const remainingCount = authors.length - 2;
+    return `by ${authors[0]}, ${authors[1]} +${remainingCount} more`;
+  }
+
+  truncateDescription(description: string, maxLength: number = 250): string {
     if (!description) return '';
     return description.length > maxLength ? description.substring(0, maxLength) + '...' : description;
+  }
+  
+  // Add tab navigation properties
+  activeTab: string = 'entries';
+  
+  // Add tab navigation method
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+    if (tab === 'entries') {
+      this.loadEntries();
+    }
+  }
+
+  // Book modal methods - Add these inside the class
+  openBookModal() {
+    this.showBookModal = true;
+    this.loadSavedBooks();
+    // Clear previous search results
+    this.bookSearchResults = [];
+    this.bookSearchQuery = '';
+    this.bookTitleQuery = '';
+    this.bookAuthorQuery = '';
+  }
+
+  closeBookModal() {
+    this.showBookModal = false;
+  }
+
+  selectBookFromModal(book: Book) {
+    this.currentEntry.associatedBook = book;
+    this.closeBookModal();
   }
 }

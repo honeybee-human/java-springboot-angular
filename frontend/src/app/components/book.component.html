@@ -104,10 +104,10 @@
             <h3 class="book-title">{{book.title}}</h3>
             <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
             <p class="book-authors" *ngIf="book.authors?.length">
-              by {{book.authors?.join(', ')}}
+              {{getAuthorDisplay(book.authors)}}
             </p>
             <p class="book-description" *ngIf="book.description">
-              {{truncateDescription(book.description, 150)}}
+              {{truncateDescription(book.description, 250)}}
             </p>
             
             <div class="book-actions">
@@ -214,7 +214,10 @@
           <h3 class="book-title">{{book.title}}</h3>
           <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
           <p class="book-authors" *ngIf="book.authors?.length">
-            by {{book.authors?.join(', ')}}
+            {{getAuthorDisplay(book.authors)}}
+          </p>
+          <p class="book-description" *ngIf="book.description">
+            {{truncateDescription(book.description, 250)}}
           </p>
           
           <div class="book-actions">
@@ -250,7 +253,10 @@
           <h3 class="book-title">{{book.title}}</h3>
           <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
           <p class="book-authors" *ngIf="book.authors?.length">
-            by {{book.authors?.join(', ')}}
+            {{getAuthorDisplay(book.authors)}}
+          </p>
+          <p class="book-description" *ngIf="book.description">
+            {{truncateDescription(book.description, 250)}}
           </p>
           
           <div class="book-actions">

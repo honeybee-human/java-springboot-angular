@@ -181,17 +181,58 @@ export class BookComponent implements OnInit {
   }
 
   saveBook(book: Book) {
-    const bookToSave = { ...book, isSaved: true };
+    // Create a clean book object with all required fields and proper defaults
+    const bookToSave: Book = {
+      googleBooksId: book.googleBooksId || `temp_${Date.now()}`,
+      title: book.title || 'Unknown Title',
+      subtitle: book.subtitle || '',
+      authors: book.authors && book.authors.length > 0 ? book.authors : ['Unknown Author'],
+      publisher: book.publisher || '',
+      publishedDate: book.publishedDate || '',
+      description: book.description || '',
+      thumbnail: book.thumbnail || '',
+      previewLink: book.previewLink || '',
+      categories: book.categories && book.categories.length > 0 ? book.categories : [],
+      averageRating: book.averageRating || 0,
+      ratingsCount: book.ratingsCount || 0,
+      isSaved: true
+    };
+
+    // Validate required fields
+    if (!bookToSave.googleBooksId || !bookToSave.title) {
+      console.error('Cannot save book: missing required fields');
+      alert('Cannot save book: missing required information');
+      return;
+    }
+
     this.bookService.saveBook(bookToSave).subscribe({
       next: (savedBook) => {
-        this.savedBooks.push(savedBook);
+        // Check if book is already in savedBooks to avoid duplicates
+        const existingIndex = this.savedBooks.findIndex(b => b.googleBooksId === book.googleBooksId);
+        if (existingIndex === -1) {
+          this.savedBooks.push(savedBook);
+        }
+        
+        // Update the search results to show as saved
         const index = this.searchResults.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (index !== -1) {
           this.searchResults[index].isSaved = true;
         }
+        
+        console.log('Book saved successfully:', savedBook);
       },
       error: (error) => {
         console.error('Error saving book:', error);
+        
+        // Show detailed error message to user
+        let errorMessage = 'Failed to save book. ';
+        if (error.error && error.error.error) {
+          errorMessage += error.error.error;
+        } else {
+          errorMessage += 'Please try again.';
+        }
+        
+        alert(errorMessage);
       }
     });
   }
@@ -233,9 +274,28 @@ export class BookComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  truncateDescription(description: string, maxLength: number = 200): string {
+  truncateDescription(description: string, maxLength: number = 250): string {
     if (!description) return '';
     return description.length > maxLength ? description.substring(0, maxLength) + '...' : description;
+  }
+
+  // Add new method for author display
+  getAuthorDisplay(authors: string[] | undefined): string {
+    if (!authors || authors.length === 0) {
+      return 'Unknown Author';
+    }
+    
+    if (authors.length === 1) {
+      return `by ${authors[0]}`;
+    }
+    
+    if (authors.length === 2) {
+      return `by ${authors[0]} and ${authors[1]}`;
+    }
+    
+    // For more than 2 authors, show first two + count
+    const remainingCount = authors.length - 2;
+    return `by ${authors[0]}, ${authors[1]} +${remainingCount} more`;
   }
 
   getPlaceholderImage(): string {
@@ -243,17 +303,51 @@ export class BookComponent implements OnInit {
   }
 
   saveFakeBook(book: Book) {
-    const bookToSave = { ...book, isSaved: true };
+    // Create a clean book object with all required fields and proper defaults
+    const bookToSave: Book = {
+      googleBooksId: book.googleBooksId || `fake_${Date.now()}`,
+      title: book.title || 'Unknown Title',
+      subtitle: book.subtitle || '',
+      authors: book.authors && book.authors.length > 0 ? book.authors : ['Unknown Author'],
+      publisher: book.publisher || '',
+      publishedDate: book.publishedDate || '',
+      description: book.description || '',
+      thumbnail: book.thumbnail || '',
+      previewLink: book.previewLink || '',
+      categories: book.categories && book.categories.length > 0 ? book.categories : [],
+      averageRating: book.averageRating || 0,
+      ratingsCount: book.ratingsCount || 0,
+      isSaved: true
+    };
+
     this.bookService.saveBook(bookToSave).subscribe({
       next: (savedBook) => {
-        this.savedBooks.push(savedBook);
+        // Check if book is already in savedBooks to avoid duplicates
+        const existingIndex = this.savedBooks.findIndex(b => b.googleBooksId === book.googleBooksId);
+        if (existingIndex === -1) {
+          this.savedBooks.push(savedBook);
+        }
+        
+        // Update the fake books to show as saved
         const index = this.fakeBooks.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (index !== -1) {
           this.fakeBooks[index].isSaved = true;
         }
+        
+        console.log('Fake book saved successfully:', savedBook);
       },
       error: (error) => {
         console.error('Error saving fake book:', error);
+        
+        // Show detailed error message to user
+        let errorMessage = 'Failed to save book. ';
+        if (error.error && error.error.error) {
+          errorMessage += error.error.error;
+        } else {
+          errorMessage += 'Please try again.';
+        }
+        
+        alert(errorMessage);
       }
     });
   }

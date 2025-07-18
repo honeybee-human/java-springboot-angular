@@ -3,9 +3,12 @@ package com.diary.controller;
 import com.diary.model.Book;
 import com.diary.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -33,8 +36,17 @@ public class BookController {
     }
     
     @PostMapping("/save")
-    public Book saveBook(@RequestBody Book book) {
-        return bookService.saveBook(book);
+    public ResponseEntity<?> saveBook(@RequestBody Book book) {
+        try {
+            Book savedBook = bookService.saveBook(book);
+            return ResponseEntity.ok(savedBook);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the full stack trace for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to save book: " + e.getMessage()));
+        }
     }
     
     @GetMapping("/saved")

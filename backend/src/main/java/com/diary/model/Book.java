@@ -9,23 +9,34 @@ public class Book {
     @Id
     private String googleBooksId;
     
+    @Column(length = 1000) // Increased from default 255
     private String title;
+    
+    @Column(length = 1000) // Increased from default 255
     private String subtitle;
     
     @ElementCollection
     @CollectionTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "author")
+    @Column(name = "author", length = 500) // Increased from default 255
     private List<String> authors;
     
+    @Column(length = 500) // Increased from default 255
     private String publisher;
+    
     private String publishedDate;
+    
+    @Column(columnDefinition = "TEXT") // Allow unlimited length for descriptions
     private String description;
+    
+    @Column(length = 1000) // Increased from default 255
     private String thumbnail;
+    
+    @Column(length = 1000) // Increased from default 255
     private String previewLink;
     
     @ElementCollection
     @CollectionTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "category")
+    @Column(name = "category", length = 500) // Increased from default 255
     private List<String> categories;
     
     private Double averageRating;

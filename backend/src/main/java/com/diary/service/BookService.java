@@ -27,6 +27,48 @@ public class BookService {
     }
     
     public Book saveBook(Book book) {
+        // Validate required fields
+        if (book.getGoogleBooksId() == null || book.getGoogleBooksId().trim().isEmpty()) {
+            throw new IllegalArgumentException("Google Books ID is required");
+        }
+        
+        if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Book title is required");
+        }
+        
+        // Set default values for null fields to prevent database issues
+        if (book.getAuthors() == null) {
+            book.setAuthors(List.of("Unknown Author"));
+        }
+        
+        if (book.getCategories() == null) {
+            book.setCategories(List.of());
+        }
+        
+        if (book.getDescription() == null) {
+            book.setDescription("");
+        }
+        
+        if (book.getThumbnail() == null) {
+            book.setThumbnail("");
+        }
+        
+        if (book.getPreviewLink() == null) {
+            book.setPreviewLink("");
+        }
+        
+        if (book.getPublisher() == null) {
+            book.setPublisher("");
+        }
+        
+        if (book.getPublishedDate() == null) {
+            book.setPublishedDate("");
+        }
+        
+        if (book.getSubtitle() == null) {
+            book.setSubtitle("");
+        }
+        
         // Check if book already exists
         Optional<Book> existingBook = bookRepository.findByGoogleBooksId(book.getGoogleBooksId());
         
