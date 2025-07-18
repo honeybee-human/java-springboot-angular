@@ -21,8 +21,9 @@ export class BookComponent implements OnInit {
   
   // Pagination properties
   currentPage = 1;
-  pageSize = 6; // Changed from 20 to 6
-  pageSizeOptions = [6, 9, 12]; // Add page size options
+  pageSize = 8; // Changed from 6 to 8
+  pageSizeOptions = [8, 16, 24]; // Updated options
+  maxResults = 48; // Add max results limit
   totalResults = 0;
   totalPages = 0;
   isLoadingMore = false;
@@ -106,14 +107,14 @@ export class BookComponent implements OnInit {
   }
 
   updatePagination(resultsCount: number) {
-    this.hasMoreResults = resultsCount === this.pageSize;
-    this.totalResults = Math.max(this.totalResults, (this.currentPage - 1) * this.pageSize + resultsCount);
+    this.hasMoreResults = resultsCount === this.pageSize && (this.currentPage * this.pageSize) < this.maxResults;
+    this.totalResults = Math.min(Math.max(this.totalResults, (this.currentPage - 1) * this.pageSize + resultsCount), this.maxResults);
     
-    if (this.hasMoreResults) {
-      this.totalResults = this.currentPage * this.pageSize + 1;
+    if (this.hasMoreResults && (this.currentPage * this.pageSize) < this.maxResults) {
+      this.totalResults = Math.min(this.currentPage * this.pageSize + 1, this.maxResults);
     }
     
-    this.totalPages = Math.ceil(this.totalResults / this.pageSize);
+    this.totalPages = Math.min(Math.ceil(this.totalResults / this.pageSize), Math.ceil(this.maxResults / this.pageSize));
   }
 
   generateVisiblePages(): number[] {
@@ -269,6 +270,8 @@ export class BookComponent implements OnInit {
 
   // Add new method to handle page size change
   onPageSizeChange() {
+    // Ensure page size doesn't exceed max results
+    this.pageSize = Math.min(this.pageSize, this.maxResults);
     this.currentPage = 1; // Reset to first page when changing page size
     this.updatePagination(this.searchResults.length);
     

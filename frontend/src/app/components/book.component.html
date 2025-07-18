@@ -38,10 +38,24 @@
             {{subject}}
           </option>
         </select>
-        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-filter">
-          <option *ngFor="let size of pageSizeOptions" [value]="size">
-            {{size}} per page
-          </option>
+        <!-- Page size selector -->
+        <div class="page-size-selector">
+          <label for="pageSize">Books per page:</label>
+          <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option [value]="8">8</option>
+            <option [value]="16">16</option>
+            <option [value]="24">24</option>
+          </select>
+        </div>
+        
+        <!-- Subject filter dropdown -->
+        <select [(ngModel)]="selectedSubject" (change)="searchBooks()" class="subject-filter">
+          <option value="">All Categories</option>
+          <option value="productivity">Productivity</option>
+          <option value="personal development">Personal Development</option>
+          <option value="mental health">Mental Health</option>
+          <option value="motivation">Motivation</option>
+          <option value="self-help">Self-Help</option>
         </select>
         <button class="search-btn" (click)="searchBooks()" [disabled]="isSearching">
           {{isSearching ? 'Searching...' : 'Search'}}

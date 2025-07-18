@@ -1,14 +1,15 @@
 package com.diary.service;
 
-import com.diary.model.DiaryEntry;
-import com.diary.model.Mood;
-import com.diary.repository.DiaryEntryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.diary.model.DiaryEntry;
+import com.diary.model.Mood;
+import com.diary.repository.DiaryEntryRepository;
 
 @Service
 public class DiaryService {

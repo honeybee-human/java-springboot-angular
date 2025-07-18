@@ -1,12 +1,13 @@
 package com.diary.service;
 
-import com.diary.model.Book;
-import com.diary.repository.BookRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.diary.model.Book;
+import com.diary.repository.BookRepository;
 
 @Service
 public class BookService {
