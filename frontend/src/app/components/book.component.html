@@ -23,40 +23,56 @@
 
   <!-- Search Tab -->
   <div *ngIf="activeTab === 'search'" class="tab-content">
-    <!-- Search Controls -->
+    <!-- Multiple Search Fields -->
     <div class="search-controls">
-      <div class="search-input-group">
-        <input 
-          type="text" 
-          placeholder="Search for motivational books..." 
-          [(ngModel)]="searchQuery"
-          (keyup.enter)="searchBooks()"
-          class="search-input">
-        <select [(ngModel)]="selectedSubject" class="subject-filter">
-          <option value="">All Categories</option>
-          <option *ngFor="let subject of wellnessSubjects" [value]="subject">
-            {{subject}}
-          </option>
-        </select>
-        <!-- Page size selector -->
+      <div class="search-fields">
+        <!-- Description Search -->
+        <div class="search-field">
+          <label for="descriptionSearch">Search by Description:</label>
+          <input 
+            id="descriptionSearch"
+            type="text" 
+            placeholder="Search in book descriptions..." 
+            [(ngModel)]="descriptionQuery"
+            (keyup.enter)="searchBooks()"
+            class="search-input">
+        </div>
+        
+        <!-- Title Search -->
+        <div class="search-field">
+          <label for="titleSearch">Search by Title:</label>
+          <input 
+            id="titleSearch"
+            type="text" 
+            placeholder="Search by book title..." 
+            [(ngModel)]="titleQuery"
+            (keyup.enter)="searchBooks()"
+            class="search-input">
+        </div>
+        
+        <!-- Author Search -->
+        <div class="search-field">
+          <label for="authorSearch">Search by Author:</label>
+          <input 
+            id="authorSearch"
+            type="text" 
+            placeholder="Search by author name..." 
+            [(ngModel)]="authorQuery"
+            (keyup.enter)="searchBooks()"
+            class="search-input">
+        </div>
+        
+        <!-- Page Size Selector -->
         <div class="page-size-selector">
           <label for="pageSize">Books per page:</label>
           <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
             <option [value]="8">8</option>
             <option [value]="16">16</option>
             <option [value]="24">24</option>
+            <option [value]="40">40</option>
           </select>
         </div>
         
-        <!-- Subject filter dropdown -->
-        <select [(ngModel)]="selectedSubject" (change)="searchBooks()" class="subject-filter">
-          <option value="">All Categories</option>
-          <option value="productivity">Productivity</option>
-          <option value="personal development">Personal Development</option>
-          <option value="mental health">Mental Health</option>
-          <option value="motivation">Motivation</option>
-          <option value="self-help">Self-Help</option>
-        </select>
         <button class="search-btn" (click)="searchBooks()" [disabled]="isSearching">
           {{isSearching ? 'Searching...' : 'Search'}}
         </button>
@@ -75,7 +91,7 @@
       <div *ngIf="!isSearching && hasSearched && searchResults.length === 0" class="empty-state">
         <div class="empty-icon">📚</div>
         <h3>No books found</h3>
-        <p>Try adjusting your search terms or browse our popular books.</p>
+        <p>Try different search terms or browse our popular books.</p>
       </div>
 
       <!-- Results Grid -->
@@ -87,17 +103,13 @@
           <div class="book-details">
             <h3 class="book-title">{{book.title}}</h3>
             <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
-            <!-- Fix for line 78 - Search Results Authors -->
             <p class="book-authors" *ngIf="book.authors?.length">
               by {{book.authors?.join(', ')}}
             </p>
+            <p class="book-description" *ngIf="book.description">
+              {{truncateDescription(book.description, 150)}}
+            </p>
             
-            <!-- Fix for line 83 - Search Results Categories -->
-            <div class="book-categories" *ngIf="book.categories?.length">
-              <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
-                {{category}}
-              </span>
-            </div>
             <div class="book-actions">
               <button 
                 *ngIf="!book.isSaved" 
@@ -165,10 +177,6 @@
             Next →
           </button>
         </div>
-        
-        <div *ngIf="isSearching" class="pagination-loading">
-          Loading...
-        </div>
       </div>
     </div>
   </div>
@@ -190,7 +198,7 @@
     <div *ngIf="!isLoadingCollection && savedBooks.length === 0" class="empty-state">
       <div class="empty-icon">📚</div>
       <h3>Your collection is empty</h3>
-      <p>Start building your motivational library by saving books from the search tab.</p>
+      <p>Start building your library by saving books from the search tab.</p>
       <button class="cta-btn" (click)="setActiveTab('search')">
         🔍 Browse Books
       </button>
@@ -205,29 +213,10 @@
         <div class="book-details">
           <h3 class="book-title">{{book.title}}</h3>
           <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
-          <!-- Fix for line 196 - Collection Authors -->
           <p class="book-authors" *ngIf="book.authors?.length">
             by {{book.authors?.join(', ')}}
           </p>
           
-          <!-- Fix for line 201 - Collection Categories -->
-          <div class="book-categories" *ngIf="book.categories?.length">
-            <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
-              {{category}}
-            </span>
-          </div>
-          
-          <!-- Fix for line 239 - Practice Books Authors -->
-          <p class="book-authors" *ngIf="book.authors?.length">
-            by {{book.authors?.join(', ')}}
-          </p>
-          
-          <!-- Fix for line 244 - Practice Books Categories -->
-          <div class="book-categories" *ngIf="book.categories?.length">
-            <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
-              {{category}}
-            </span>
-          </div>
           <div class="book-actions">
             <button class="remove-btn" (click)="removeFromCollection(book.googleBooksId)">
               🗑️ Remove
@@ -249,7 +238,7 @@
   <div *ngIf="activeTab === 'practice'" class="tab-content">
     <div class="practice-header">
       <h2>🌟 Practice with Sample Books</h2>
-      <p>Explore these curated motivational books to test the app features</p>
+      <p>Explore these curated books to test the app features</p>
     </div>
 
     <div class="books-grid">
@@ -260,17 +249,10 @@
         <div class="book-details">
           <h3 class="book-title">{{book.title}}</h3>
           <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
-          <!-- Fix for line 251 - Practice Books Authors -->
           <p class="book-authors" *ngIf="book.authors?.length">
             by {{book.authors?.join(', ')}}
           </p>
           
-          <!-- Fix for line 256 - Practice Books Categories -->
-          <div class="book-categories" *ngIf="book.categories?.length">
-            <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
-              {{category}}
-            </span>
-          </div>
           <div class="book-actions">
             <button 
               *ngIf="!checkSavedStatus(book)" 

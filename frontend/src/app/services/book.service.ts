@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators'; // Add catchError to the import
 import { Book } from '../models/book.model';
 
 @Injectable({
@@ -12,43 +11,42 @@ export class BookService {
 
   constructor(private http: HttpClient) {}
 
-  searchBooks(query?: string, subject?: string, page: number = 0, size: number = 6): Observable<Book[]> {
-    let params = `page=${page}&size=${size}`;
-    if (query) params += `&q=${encodeURIComponent(query)}`;
-    if (subject) params += `&subject=${encodeURIComponent(subject)}`;
+  searchBooksAdvanced(descriptionQuery: string, titleQuery: string, authorQuery: string, page: number, size: number): Observable<Book[]> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
     
-    console.log('API Request:', `${this.apiUrl}/search?${params}`);
-    
-    return this.http.get<Book[]>(`${this.apiUrl}/search?${params}`).pipe(
-      tap(books => console.log('API Response:', books))
-    );
+    if (descriptionQuery) {
+      params = params.set('description', descriptionQuery);
+    }
+    if (titleQuery) {
+      params = params.set('title', titleQuery);
+    }
+    if (authorQuery) {
+      params = params.set('author', authorQuery);
+    }
+
+    return this.http.get<Book[]>(`${this.apiUrl}/search-advanced`, { params });
   }
 
-  getPopularBooks(page: number = 0, size: number = 6): Observable<Book[]> {
-    console.log('Popular Books Request:', `${this.apiUrl}/popular?page=${page}&size=${size}`);
-    
-    return this.http.get<Book[]>(`${this.apiUrl}/popular?page=${page}&size=${size}`).pipe(
-      tap(books => console.log('Popular Books Response:', books))
-    );
+  getPopularBooks(page: number, size: number): Observable<Book[]> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Book[]>(`${this.apiUrl}/popular`, { params });
   }
 
   saveBook(book: Book): Observable<Book> {
-    console.log('Saving book:', book);
-    return this.http.post<Book>(`${this.apiUrl}/save`, book).pipe(
-      tap(savedBook => console.log('Book saved successfully:', savedBook)),
-      catchError(error => {
-        console.error('Error saving book:', error);
-        throw error;
-      })
-    );
+    return this.http.post<Book>(`${this.apiUrl}/save`, book);
   }
 
   getSavedBooks(): Observable<Book[]> {
-    return this.http.get<Book[]>(`${this.apiUrl}/collection`);
+    return this.http.get<Book[]>(`${this.apiUrl}/saved`);
   }
 
   removeFromCollection(bookId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/collection/${bookId}`);
+    return this.http.delete<void>(`${this.apiUrl}/saved/${bookId}`);
   }
 
   getWellnessSubjects(): Observable<string[]> {

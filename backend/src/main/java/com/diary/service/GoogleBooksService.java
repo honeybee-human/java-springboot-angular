@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,212 +25,127 @@ public class GoogleBooksService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     
-    // Target wellness categories that we want to filter by
-    private static final List<String> WELLNESS_CATEGORIES = Arrays.asList(
-        "Personal Growth", "Motivational", "Self-Help", "Mindfulness"
-    );
-    
-    // Specific subject queries for targeted Google Books API calls
-    private static final String[] TARGETED_SUBJECTS = {
-        "subject:self-help",
-        "subject:productivity", 
-        "subject:personal+development",
-        "subject:mental+health"
+    // Target subjects for API queries
+    private static final String[] TARGET_SUBJECTS = {
+        "mindfulness", "motivation", "self-help"
     };
     
-    public List<Book> searchBooks(String query, String category, int page, int size) {
+    public List<Book> searchBooksAdvanced(String descriptionQuery, String titleQuery, String authorQuery, int page, int size) {
         try {
-            // Limit size to maximum of 48
-            size = Math.min(size, 48);
+            List<Book> allBooks = new ArrayList<>();
             
-            if (category != null && !category.trim().isEmpty() && WELLNESS_CATEGORIES.contains(category)) {
-                // Search for books and filter by specific category
-                return searchBooksForCategory(query, category, page, size);
-            } else {
-                // Search across all wellness subjects and filter by categories
-                return searchBooksAcrossAllSubjects(query, page, size);
+            // First, get books from target subjects
+            for (String subject : TARGET_SUBJECTS) {
+                try {
+                    String query = buildSubjectQuery(subject, titleQuery, authorQuery);
+                    List<Book> subjectBooks = fetchBooksFromAPI(query, page, size / TARGET_SUBJECTS.length);
+                    allBooks.addAll(subjectBooks);
+                } catch (Exception e) {
+                    System.err.println("Error fetching books for subject: " + subject + ", " + e.getMessage());
+                }
             }
+            
+            // Remove duplicates
+            List<Book> uniqueBooks = removeDuplicateBooks(allBooks);
+            
+            // Filter by description if provided
+            if (descriptionQuery != null && !descriptionQuery.trim().isEmpty()) {
+                uniqueBooks = filterBooksByDescription(uniqueBooks, descriptionQuery.trim());
+            }
+            
+            return uniqueBooks.stream().limit(size).collect(Collectors.toList());
+            
         } catch (Exception e) {
-            System.err.println("Error searching books: " + e.getMessage());
+            System.err.println("Error in advanced search: " + e.getMessage());
             throw new RuntimeException("Error searching books: " + e.getMessage());
         }
     }
     
     public List<Book> getPopularBooks(int page, int size) {
         try {
-            // Limit size to maximum of 48
-            size = Math.min(size, 48);
+            List<Book> allBooks = new ArrayList<>();
             
-            // Get popular books from targeted subjects and filter by categories
-            return getPopularBooksFromTargetedSubjects(page, size);
+            for (String subject : TARGET_SUBJECTS) {
+                try {
+                    String query = "subject:" + subject;
+                    List<Book> subjectBooks = fetchBooksFromAPI(query, page, size / TARGET_SUBJECTS.length);
+                    allBooks.addAll(subjectBooks);
+                } catch (Exception e) {
+                    System.err.println("Error fetching popular books for subject: " + subject + ", " + e.getMessage());
+                }
+            }
+            
+            List<Book> uniqueBooks = removeDuplicateBooks(allBooks);
+            return uniqueBooks.stream().limit(size).collect(Collectors.toList());
+            
         } catch (Exception e) {
             System.err.println("Error fetching popular books: " + e.getMessage());
             throw new RuntimeException("Error fetching popular books: " + e.getMessage());
         }
     }
     
-    private List<Book> searchBooksForCategory(String query, String category, int page, int size) {
-        List<Book> allBooks = new ArrayList<>();
-        int booksPerSubject = Math.max(1, (size * 2) / TARGETED_SUBJECTS.length); // Get more to account for filtering
+    private String buildSubjectQuery(String subject, String titleQuery, String authorQuery) throws UnsupportedEncodingException {
+        StringBuilder query = new StringBuilder();
+        query.append("subject:").append(subject);
         
-        for (String subjectQuery : TARGETED_SUBJECTS) {
-            try {
-                String searchQuery = query != null && !query.trim().isEmpty() 
-                    ? query.trim().replace(" ", "+") + "+AND+" + subjectQuery
-                    : subjectQuery;
-                
-                int startIndex = page * booksPerSubject;
-                String url = "https://www.googleapis.com/books/v1/volumes?q=" + searchQuery
-                           + "&maxResults=" + booksPerSubject + "&startIndex=" + startIndex
-                           + "&printType=books&langRestrict=en";
-                
-                if (!apiKey.isEmpty()) {
-                    url += "&key=" + apiKey;
-                }
-                
-                System.out.println("Category search URL for " + subjectQuery + ": " + url);
-                String response = restTemplate.getForObject(url, String.class);
-                List<Book> subjectBooks = parseGoogleBooksResponse(response);
-                allBooks.addAll(subjectBooks);
-                
-            } catch (Exception e) {
-                System.err.println("Error fetching books for subject: " + subjectQuery + ", " + e.getMessage());
-            }
+        if (titleQuery != null && !titleQuery.trim().isEmpty()) {
+            query.append("+intitle:").append(URLEncoder.encode(titleQuery.trim(), "UTF-8"));
         }
         
-        // Filter by specific category and remove duplicates
-        List<Book> filteredBooks = filterBooksByCategory(allBooks, category);
-        List<Book> uniqueBooks = removeDuplicateBooks(filteredBooks);
-        return uniqueBooks.stream().limit(size).collect(Collectors.toList());
-    }
-    
-    private List<Book> searchBooksAcrossAllSubjects(String query, int page, int size) {
-        List<Book> allBooks = new ArrayList<>();
-        int booksPerSubject = Math.max(1, (size * 2) / TARGETED_SUBJECTS.length); // Get more to account for filtering
-        
-        for (String subjectQuery : TARGETED_SUBJECTS) {
-            try {
-                String searchQuery = query != null && !query.trim().isEmpty() 
-                    ? query.trim().replace(" ", "+") + "+AND+" + subjectQuery
-                    : subjectQuery;
-                
-                int startIndex = page * booksPerSubject;
-                String url = "https://www.googleapis.com/books/v1/volumes?q=" + searchQuery
-                           + "&maxResults=" + booksPerSubject + "&startIndex=" + startIndex
-                           + "&printType=books&langRestrict=en";
-                
-                if (!apiKey.isEmpty()) {
-                    url += "&key=" + apiKey;
-                }
-                
-                System.out.println("Multi-subject search URL for " + subjectQuery + ": " + url);
-                String response = restTemplate.getForObject(url, String.class);
-                List<Book> subjectBooks = parseGoogleBooksResponse(response);
-                allBooks.addAll(subjectBooks);
-                
-            } catch (Exception e) {
-                System.err.println("Error fetching books for subject: " + subjectQuery + ", " + e.getMessage());
-            }
+        if (authorQuery != null && !authorQuery.trim().isEmpty()) {
+            query.append("+inauthor:").append(URLEncoder.encode(authorQuery.trim(), "UTF-8"));
         }
         
-        // Filter by all wellness categories and remove duplicates
-        List<Book> filteredBooks = filterBooksByAllCategories(allBooks);
-        List<Book> uniqueBooks = removeDuplicateBooks(filteredBooks);
-        return uniqueBooks.stream().limit(size).collect(Collectors.toList());
+        return query.toString();
     }
     
-    private List<Book> getPopularBooksFromTargetedSubjects(int page, int size) {
-        List<Book> allBooks = new ArrayList<>();
-        int booksPerSubject = Math.max(1, (size * 2) / TARGETED_SUBJECTS.length); // Get more to account for filtering
-        
-        for (String subjectQuery : TARGETED_SUBJECTS) {
-            try {
-                int startIndex = page * booksPerSubject;
-                String url = "https://www.googleapis.com/books/v1/volumes?q=" + subjectQuery
-                           + "&orderBy=relevance&maxResults=" + booksPerSubject + "&startIndex=" + startIndex
-                           + "&printType=books&langRestrict=en";
-                
-                if (!apiKey.isEmpty()) {
-                    url += "&key=" + apiKey;
-                }
-                
-                System.out.println("Popular books URL for " + subjectQuery + ": " + url);
-                String response = restTemplate.getForObject(url, String.class);
-                List<Book> subjectBooks = parseGoogleBooksResponse(response);
-                allBooks.addAll(subjectBooks);
-                
-            } catch (Exception e) {
-                System.err.println("Error fetching popular books for subject: " + subjectQuery + ", " + e.getMessage());
+    private List<Book> fetchBooksFromAPI(String query, int page, int maxResults) {
+        try {
+            maxResults = Math.max(maxResults, 10); // Minimum 10 per query
+            int startIndex = page * maxResults;
+            
+            String url = "https://www.googleapis.com/books/v1/volumes?q=" + query
+                       + "&maxResults=" + maxResults + "&startIndex=" + startIndex
+                       + "&printType=books&langRestrict=en";
+            
+            if (!apiKey.isEmpty()) {
+                url += "&key=" + apiKey;
             }
+            
+            System.out.println("API URL: " + url);
+            String response = restTemplate.getForObject(url, String.class);
+            return parseGoogleBooksResponse(response);
+            
+        } catch (Exception e) {
+            System.err.println("Error fetching from API: " + e.getMessage());
+            return new ArrayList<>();
         }
-        
-        // Filter by wellness categories and remove duplicates
-        List<Book> filteredBooks = filterBooksByAllCategories(allBooks);
-        List<Book> uniqueBooks = removeDuplicateBooks(filteredBooks);
-        return uniqueBooks.stream().limit(size).collect(Collectors.toList());
     }
     
-    private List<Book> filterBooksByCategory(List<Book> books, String targetCategory) {
+    private List<Book> filterBooksByDescription(List<Book> books, String descriptionQuery) {
         List<Book> filteredBooks = new ArrayList<>();
+        String[] searchTerms = descriptionQuery.toLowerCase().split("\\s+");
         
         for (Book book : books) {
-            if (book.getCategories() != null && !book.getCategories().isEmpty()) {
-                for (String category : book.getCategories()) {
-                    String lowerCategory = category.toLowerCase();
-                    String lowerTarget = targetCategory.toLowerCase();
-                    
-                    // Check for exact matches or partial matches for wellness categories
-                    if (lowerCategory.contains(lowerTarget) ||
-                        (lowerTarget.equals("personal growth") && (lowerCategory.contains("personal development") || lowerCategory.contains("self-improvement"))) ||
-                        (lowerTarget.equals("motivational") && lowerCategory.contains("motivation")) ||
-                        (lowerTarget.equals("self-help") && (lowerCategory.contains("self-help") || lowerCategory.contains("self help"))) ||
-                        (lowerTarget.equals("mindfulness") && (lowerCategory.contains("mindfulness") || lowerCategory.contains("meditation")))) {
-                        filteredBooks.add(book);
+            if (book.getDescription() != null && !book.getDescription().trim().isEmpty()) {
+                String description = book.getDescription().toLowerCase();
+                
+                // Check if description contains any of the search terms
+                boolean matches = false;
+                for (String term : searchTerms) {
+                    if (description.contains(term.toLowerCase())) {
+                        matches = true;
                         break;
                     }
                 }
-            }
-        }
-        
-        System.out.println("Filtered books for category '" + targetCategory + "': " + filteredBooks.size() + " from " + books.size());
-        return filteredBooks;
-    }
-    
-    private List<Book> filterBooksByAllCategories(List<Book> books) {
-        // Since we're already searching targeted wellness subjects (self-help, productivity, etc.),
-        // we can be more trusting of the results and do minimal filtering
-        List<Book> filteredBooks = new ArrayList<>();
-        
-        for (Book book : books) {
-            // Only exclude books with clearly non-wellness categories
-            boolean shouldExclude = false;
-            
-            if (book.getCategories() != null && !book.getCategories().isEmpty()) {
-                for (String category : book.getCategories()) {
-                    String lowerCategory = category.toLowerCase();
-                    // Exclude clearly non-wellness categories
-                    if (lowerCategory.contains("fiction") ||
-                        lowerCategory.contains("novel") ||
-                        lowerCategory.contains("romance") ||
-                        lowerCategory.contains("mystery") ||
-                        lowerCategory.contains("fantasy") ||
-                        lowerCategory.contains("science fiction") ||
-                        lowerCategory.contains("cooking") ||
-                        lowerCategory.contains("travel") ||
-                        lowerCategory.contains("history") ||
-                        lowerCategory.contains("biography") && !lowerCategory.contains("self")) {
-                        shouldExclude = true;
-                        break;
-                    }
+                
+                if (matches) {
+                    filteredBooks.add(book);
                 }
             }
-            
-            if (!shouldExclude) {
-                filteredBooks.add(book);
-            }
         }
         
-        System.out.println("Filtered books for all wellness categories: " + filteredBooks.size() + " from " + books.size());
+        System.out.println("Filtered by description '" + descriptionQuery + "': " + filteredBooks.size() + " from " + books.size());
         return filteredBooks;
     }
     
@@ -243,7 +160,6 @@ public class GoogleBooksService {
             }
         }
         
-        System.out.println("Removed duplicates: " + books.size() + " -> " + uniqueBooks.size() + " unique books");
         return uniqueBooks;
     }
     
@@ -251,7 +167,6 @@ public class GoogleBooksService {
         List<Book> books = new ArrayList<>();
         
         if (response == null || response.trim().isEmpty()) {
-            System.err.println("Empty response from Google Books API");
             return books;
         }
         
@@ -326,6 +241,6 @@ public class GoogleBooksService {
     }
     
     public List<String> getWellnessSubjects() {
-        return WELLNESS_CATEGORIES;
+        return Arrays.asList(TARGET_SUBJECTS);
     }
 }
