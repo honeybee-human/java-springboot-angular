@@ -21,7 +21,14 @@ export enum Mood {
   PEACEFUL = 'PEACEFUL'
 }
 
-export const MoodDisplay = {
+// Add this interface for the type
+export interface MoodDisplayInfo {
+  emoji: string;
+  description: string;
+}
+
+// Keep the const object for the actual data
+export const MoodDisplay: Record<Mood, MoodDisplayInfo> = {
   [Mood.VERY_HAPPY]: { emoji: '😄', description: 'Very Happy' },
   [Mood.HAPPY]: { emoji: '😊', description: 'Happy' },
   [Mood.NEUTRAL]: { emoji: '😐', description: 'Neutral' },

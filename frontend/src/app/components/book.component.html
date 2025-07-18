@@ -1,0 +1,299 @@
+<div class="book-container">
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'search'"
+      (click)="setActiveTab('search')">
+      🔍 Search Books
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'collection'"
+      (click)="setActiveTab('collection')">
+      📚 My Collection ({{savedBooks.length}})
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'practice'"
+      (click)="setActiveTab('practice')">
+      🌟 Practice Books
+    </button>
+  </div>
+
+  <!-- Search Tab -->
+  <div *ngIf="activeTab === 'search'" class="tab-content">
+    <!-- Search Controls -->
+    <div class="search-controls">
+      <div class="search-input-group">
+        <input 
+          type="text" 
+          placeholder="Search for motivational books..." 
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="searchBooks()"
+          class="search-input">
+        <select [(ngModel)]="selectedSubject" class="subject-filter">
+          <option value="">All Categories</option>
+          <option *ngFor="let subject of wellnessSubjects" [value]="subject">
+            {{subject}}
+          </option>
+        </select>
+        <button class="search-btn" (click)="searchBooks()" [disabled]="isSearching">
+          {{isSearching ? 'Searching...' : 'Search'}}
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results">
+      <!-- Loading State -->
+      <div *ngIf="isSearching" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Searching for books...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isSearching && hasSearched && searchResults.length === 0" class="empty-state">
+        <div class="empty-icon">📚</div>
+        <h3>No books found</h3>
+        <p>Try adjusting your search terms or browse our popular books.</p>
+      </div>
+
+      <!-- Results Grid -->
+      <div *ngIf="!isSearching && searchResults.length > 0" class="books-grid">
+        <div *ngFor="let book of displayedSearchResults" class="book-card">
+          <div class="book-image">
+            <img [src]="book.thumbnail || getPlaceholderImage()" [alt]="book.title" loading="lazy">
+          </div>
+          <div class="book-details">
+            <h3 class="book-title">{{book.title}}</h3>
+            <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
+            <p class="book-authors" *ngIf="book.authors?.length">
+              by {{book.authors.join(', ')}}
+            </p>
+            <p class="book-publisher" *ngIf="book.publisher">
+              {{book.publisher}}
+              <span *ngIf="book.publishedDate"> • {{book.publishedDate}}</span>
+            </p>
+            <div class="book-rating" *ngIf="book.averageRating">
+              <span class="stars">{{getStars(book.averageRating)}}</span>
+              <span class="rating-text">
+                {{book.averageRating}}/5 ({{book.ratingsCount || 0}} reviews)
+              </span>
+            </div>
+            <p class="book-description" *ngIf="book.description">
+              {{truncateDescription(book.description)}}
+            </p>
+            <div class="book-categories" *ngIf="book.categories?.length">
+              <span *ngFor="let category of book.categories.slice(0, 3)" class="category-tag">
+                {{category}}
+              </span>
+            </div>
+            <div class="book-actions">
+              <button 
+                *ngIf="!book.isSaved" 
+                class="save-btn" 
+                (click)="saveBook(book)">
+                💾 Save to Collection
+              </button>
+              <button 
+                *ngIf="book.isSaved" 
+                class="saved-btn" 
+                disabled>
+                ✅ Saved
+              </button>
+              <a 
+                *ngIf="book.previewLink" 
+                [href]="book.previewLink" 
+                target="_blank" 
+                class="preview-btn">
+                👁️ Preview
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!isSearching && searchResults.length > 0 && totalPages > 1" class="pagination">
+        <div class="pagination-info">
+          Showing page {{currentPage}} of {{totalPages}} 
+          <span *ngIf="totalResults > 0">({{totalResults}} results)</span>
+        </div>
+        
+        <div class="pagination-controls">
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === 1 || isSearching"
+            (click)="goToPreviousPage()">
+            ← Previous
+          </button>
+          
+          <button 
+            *ngFor="let page of visiblePages" 
+            class="page-btn" 
+            [class.active]="page === currentPage"
+            [disabled]="isSearching"
+            (click)="goToPage(page)">
+            {{page}}
+          </button>
+          
+          <span *ngIf="totalPages > 5 && visiblePages[visiblePages.length - 1] < totalPages" class="ellipsis">
+            ...
+          </span>
+          
+          <button 
+            *ngIf="totalPages > 5 && visiblePages[visiblePages.length - 1] < totalPages" 
+            class="page-btn" 
+            [disabled]="isSearching"
+            (click)="goToPage(totalPages)">
+            {{totalPages}}
+          </button>
+          
+          <button 
+            class="page-btn" 
+            [disabled]="currentPage === totalPages || isSearching"
+            (click)="goToNextPage()">
+            Next →
+          </button>
+        </div>
+        
+        <div *ngIf="isSearching" class="pagination-loading">
+          Loading...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collection Tab -->
+  <div *ngIf="activeTab === 'collection'" class="tab-content">
+    <div class="collection-header">
+      <h2>📚 My Book Collection</h2>
+      <p>Books you've saved for later reading</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoadingCollection" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading your collection...</p>
+    </div>
+
+    <!-- Empty Collection -->
+    <div *ngIf="!isLoadingCollection && savedBooks.length === 0" class="empty-state">
+      <div class="empty-icon">📚</div>
+      <h3>Your collection is empty</h3>
+      <p>Start building your motivational library by saving books from the search tab.</p>
+      <button class="cta-btn" (click)="setActiveTab('search')">
+        🔍 Browse Books
+      </button>
+    </div>
+
+    <!-- Collection Grid -->
+    <div *ngIf="!isLoadingCollection && savedBooks.length > 0" class="books-grid">
+      <div *ngFor="let book of savedBooks" class="book-card">
+        <div class="book-image">
+          <img [src]="book.thumbnail || getPlaceholderImage()" [alt]="book.title" loading="lazy">
+        </div>
+        <div class="book-details">
+          <h3 class="book-title">{{book.title}}</h3>
+          <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
+          <p class="book-authors" *ngIf="book.authors?.length">
+            by {{book.authors.join(', ')}}
+          </p>
+          <p class="book-publisher" *ngIf="book.publisher">
+            {{book.publisher}}
+            <span *ngIf="book.publishedDate"> • {{book.publishedDate}}</span>
+          </p>
+          <div class="book-rating" *ngIf="book.averageRating">
+            <span class="stars">{{getStars(book.averageRating)}}</span>
+            <span class="rating-text">
+              {{book.averageRating}}/5 ({{book.ratingsCount || 0}} reviews)
+            </span>
+          </div>
+          <p class="book-description" *ngIf="book.description">
+            {{truncateDescription(book.description)}}
+          </p>
+          <div class="book-categories" *ngIf="book.categories?.length">
+            <span *ngFor="let category of book.categories.slice(0, 3)" class="category-tag">
+              {{category}}
+            </span>
+          </div>
+          <div class="book-actions">
+            <button class="remove-btn" (click)="removeFromCollection(book.googleBooksId)">
+              🗑️ Remove
+            </button>
+            <a 
+              *ngIf="book.previewLink" 
+              [href]="book.previewLink" 
+              target="_blank" 
+              class="preview-btn">
+              👁️ Preview
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Practice Tab -->
+  <div *ngIf="activeTab === 'practice'" class="tab-content">
+    <div class="practice-header">
+      <h2>🌟 Practice with Sample Books</h2>
+      <p>Explore these curated motivational books to test the app features</p>
+    </div>
+
+    <div class="books-grid">
+      <div *ngFor="let book of fakeBooks" class="book-card">
+        <div class="book-image">
+          <img [src]="book.thumbnail || getPlaceholderImage()" [alt]="book.title" loading="lazy">
+        </div>
+        <div class="book-details">
+          <h3 class="book-title">{{book.title}}</h3>
+          <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
+          <p class="book-authors" *ngIf="book.authors?.length">
+            by {{book.authors.join(', ')}}
+          </p>
+          <p class="book-publisher" *ngIf="book.publisher">
+            {{book.publisher}}
+            <span *ngIf="book.publishedDate"> • {{book.publishedDate}}</span>
+          </p>
+          <div class="book-rating" *ngIf="book.averageRating">
+            <span class="stars">{{getStars(book.averageRating)}}</span>
+            <span class="rating-text">
+              {{book.averageRating}}/5 ({{book.ratingsCount || 0}} reviews)
+            </span>
+          </div>
+          <p class="book-description" *ngIf="book.description">
+            {{truncateDescription(book.description)}}
+          </p>
+          <div class="book-categories" *ngIf="book.categories?.length">
+            <span *ngFor="let category of book.categories.slice(0, 3)" class="category-tag">
+              {{category}}
+            </span>
+          </div>
+          <div class="book-actions">
+            <button 
+              *ngIf="!checkSavedStatus(book)" 
+              class="save-btn" 
+              (click)="saveFakeBook(book)">
+              💾 Save to Collection
+            </button>
+            <button 
+              *ngIf="checkSavedStatus(book)" 
+              class="saved-btn" 
+              disabled>
+              ✅ Saved
+            </button>
+            <a 
+              *ngIf="book.previewLink" 
+              [href]="book.previewLink" 
+              target="_blank" 
+              class="preview-btn">
+              👁️ Preview
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

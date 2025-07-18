@@ -1,0 +1,122 @@
+<div class="diary-container">
+  <!-- Header with Search and Add Button -->
+  <div class="diary-header">
+    <div class="search-section">
+      <input 
+        type="text" 
+        placeholder="Search entries..." 
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        class="search-input">
+      <select [(ngModel)]="filterMood" (change)="onMoodFilter()" class="mood-filter">
+        <option value="">All Moods</option>
+        <option *ngFor="let mood of moods" [value]="mood">
+          {{getMoodDisplay(mood).emoji}} {{getMoodDisplay(mood).description}}
+        </option>
+      </select>
+    </div>
+    <button class="add-btn" (click)="showAddForm = true">
+      ✏️ New Entry
+    </button>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div *ngIf="showAddForm || editingEntry" class="entry-form-card">
+    <h3>{{editingEntry ? 'Edit Entry' : 'New Diary Entry'}}</h3>
+    <form (ngSubmit)="saveEntry()" #entryForm="ngForm">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input 
+          type="text" 
+          id="title"
+          [(ngModel)]="currentEntry.title" 
+          name="title"
+          required
+          class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="mood">How are you feeling?</label>
+        <div class="mood-selector">
+          <div 
+            *ngFor="let mood of moods" 
+            class="mood-option"
+            [class.selected]="currentEntry.mood === mood"
+            (click)="currentEntry.mood = mood">
+            <span class="mood-emoji">{{getMoodDisplay(mood).emoji}}</span>
+            <span class="mood-label">{{getMoodDisplay(mood).description}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea 
+          id="content"
+          [(ngModel)]="currentEntry.content" 
+          name="content"
+          required
+          rows="6"
+          class="form-control"
+          placeholder="Write about your day..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="tags">Tags (comma separated)</label>
+        <input 
+          type="text" 
+          id="tags"
+          [(ngModel)]="tagsString" 
+          name="tags"
+          class="form-control"
+          placeholder="work, family, travel">
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="save-btn" [disabled]="!entryForm.valid">
+          {{editingEntry ? 'Update' : 'Save'}} Entry
+        </button>
+        <button type="button" class="cancel-btn" (click)="cancelEdit()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Entries List -->
+  <div class="entries-list">
+    <div *ngIf="loading" class="loading">Loading entries...</div>
+    <div *ngIf="!loading && entries.length === 0" class="no-entries">
+      <p>No diary entries yet. Start writing your first entry!</p>
+    </div>
+    
+    <div *ngFor="let entry of entries" class="entry-card">
+      <div class="entry-header">
+        <h3 class="entry-title">{{entry.title}}</h3>
+        <div class="entry-mood">
+          <span class="mood-display">
+            {{getMoodDisplay(entry.mood).emoji}} {{getMoodDisplay(entry.mood).description}}
+          </span>
+        </div>
+      </div>
+      
+      <div class="entry-meta">
+        <span class="entry-date">{{formatDate(entry.createdAt)}}</span>
+        <div class="entry-tags">
+          <span *ngFor="let tag of entry.tags" class="tag">{{tag}}</span>
+        </div>
+      </div>
+      
+      <div class="entry-content">
+        <p>{{entry.content}}</p>
+      </div>
+      
+      <div class="entry-actions">
+        <button class="edit-btn" (click)="editEntry(entry)">✏️ Edit</button>
+        <button class="delete-btn" (click)="deleteEntry(entry.id!)">
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
