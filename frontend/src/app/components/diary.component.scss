@@ -486,7 +486,7 @@
   }
 }
 
-.modal-close {
+.btn-close {
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -537,7 +537,7 @@
   transition: all 0.3s ease;
   
   &:hover {
-    border-color: #4caf50;
+    border-color: #28a745;
     background-color: #f8f9fa;
     transform: translateY(-2px);
   }
@@ -585,18 +585,6 @@
   margin-bottom: 20px;
 }
 
-.book-search-input {
-  padding: 10px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  
-  &:focus {
-    outline: none;
-    border-color: #4caf50;
-  }
-}
-
 .book-results {
   h4 {
     color: #2d5a27;
@@ -619,7 +607,7 @@
   transition: all 0.3s ease;
   
   &:hover {
-    border-color: #4caf50;
+    border-color: #28a745;
     background-color: #f8f9fa;
     transform: translateY(-2px);
   }
@@ -658,4 +646,88 @@
   padding: 20px;
   color: #666;
   font-style: italic;
+}
+
+/* Form and Layout Improvements */
+.form-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.entries-section {
+  h3 {
+    color: #2d5a27;
+    margin-bottom: 20px;
+  }
+}
+
+.search-fields {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 20px;
+  
+  .search-field {
+    flex: 1;
+  }
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+  
+  &.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+    
+    &:hover {
+      background-color: #1e7e34;
+    }
+  }
+  
+  &.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    
+    &:hover {
+      background-color: #545b62;
+    }
+  }
+  
+  &.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+    
+    &:hover {
+      background-color: #007bff;
+      color: white;
+    }
+  }
+  
+  &.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+    
+    &:hover {
+      background-color: #dc3545;
+      color: white;
+    }
+  }
 }

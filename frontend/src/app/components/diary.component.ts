@@ -276,13 +276,13 @@ export class DiaryComponent implements OnInit {
   }
   
   // Add tab navigation properties
-  activeTab: string = 'entries';
+  activeTab: string = 'add'; // Changed default to 'add'
   
   // Add tab navigation method
   setActiveTab(tab: string) {
     this.activeTab = tab;
-    if (tab === 'entries') {
-      this.loadEntries();
+    if (tab === 'add') {
+      this.loadEntries(); // Load entries when switching to add tab
     }
   }
 

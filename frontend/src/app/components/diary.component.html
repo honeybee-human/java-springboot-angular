@@ -3,122 +3,204 @@
   <div class="tab-navigation">
     <button 
       class="tab-btn" 
-      [class.active]="activeTab === 'entries'"
-      (click)="setActiveTab('entries')">
-      📖 My Entries
+      [class.active]="activeTab === 'add'"
+      (click)="setActiveTab('add'); showAddForm = true">
+      ✏️ New Entry
     </button>
     <button 
       class="tab-btn" 
       [class.active]="activeTab === 'search'"
       (click)="setActiveTab('search')">
-      🔍 Search Entries
-    </button>
-    <button 
-      class="tab-btn" 
-      [class.active]="activeTab === 'add'"
-      (click)="setActiveTab('add'); showAddForm = true">
-      ✏️ New Entry
+      🔍 Advanced Search
     </button>
   </div>
 
-  <!-- Entries Tab -->
-  <div *ngIf="activeTab === 'entries'" class="tab-content">
-    <!-- Quick Search -->
-    <div class="search-controls">
-      <div class="search-fields">
-        <div class="search-field">
-          <label for="quickSearch">Quick Search:</label>
+  <!-- New Entry Tab with Entries List Below -->
+  <div *ngIf="activeTab === 'add'" class="tab-content">
+    <!-- Add/Edit Form -->
+    <div class="form-section">
+      <h3>{{editingEntry ? 'Edit Entry' : 'New Diary Entry'}}</h3>
+      <form (ngSubmit)="saveEntry()" #entryForm="ngForm">
+        <div class="form-group">
+          <label for="title">Title</label>
           <input 
-            id="quickSearch"
             type="text" 
-            placeholder="Search all entries..." 
-            [(ngModel)]="searchQuery"
-            (input)="onSearch()"
-            (keyup.enter)="onSearch()"
-            class="search-input">
+            id="title"
+            [(ngModel)]="currentEntry.title" 
+            name="title"
+            required
+            class="form-control">
         </div>
         
-        <button class="search-btn" (click)="onSearch()" [disabled]="loading">
-          {{loading ? 'Searching...' : 'Search'}}
-        </button>
-      </div>
-    </div>
-
-    <!-- Entries List -->
-    <div class="entries-section">
-      <!-- Loading State -->
-      <div *ngIf="loading" class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading entries...</p>
-      </div>
-
-      <!-- Empty State -->
-      <div *ngIf="!loading && entries.length === 0" class="empty-state">
-        <div class="empty-icon">📖</div>
-        <h3>No entries found</h3>
-        <p>Start writing your first diary entry or try different search terms.</p>
-        <button class="cta-btn" (click)="setActiveTab('add'); showAddForm = true">
-          ✏️ Write First Entry
-        </button>
-      </div>
-
-      <!-- Entries Grid -->
-      <div *ngIf="!loading && entries.length > 0" class="entries-grid">
-        <div *ngIf="loading" class="loading">Loading entries...</div>
-        <div *ngIf="!loading && entries.length === 0" class="no-entries">
-          <p>No diary entries yet. Start writing your first entry!</p>
-        </div>
-        
-        <div *ngFor="let entry of entries" class="entry-card">
-          <div class="entry-header">
-            <h3 class="entry-title">{{entry.title}}</h3>
-            <div class="entry-mood">
-              <span class="mood-display">
-                {{getMoodDisplay(entry.mood).emoji}} {{getMoodDisplay(entry.mood).description}}
-              </span>
+        <div class="form-group">
+          <label for="mood">How are you feeling?</label>
+          <div class="mood-selector">
+            <div 
+              *ngFor="let mood of moods" 
+              class="mood-option"
+              [class.selected]="currentEntry.mood === mood"
+              (click)="currentEntry.mood = mood">
+              <span class="mood-emoji">{{getMoodDisplay(mood).emoji}}</span>
+              <span class="mood-label">{{getMoodDisplay(mood).description}}</span>
             </div>
           </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea 
+            id="content"
+            [(ngModel)]="currentEntry.content" 
+            name="content"
+            required
+            rows="6"
+            class="form-control"
+            placeholder="Write about your day..."></textarea>
+        </div>
+        
+        <!-- Book Selection Section -->
+        <div class="form-group">
+          <label>Associated Book (Optional)</label>
           
-          <!-- Associated Book Display -->
-          <div *ngIf="entry.associatedBook" class="entry-book">
-            <div class="book-reference">
-              <img [src]="entry.associatedBook.thumbnail || 'https://via.placeholder.com/40x60'" 
-                   [alt]="entry.associatedBook.title" class="entry-book-thumbnail">
-              <div class="entry-book-info">
-                <span class="entry-book-title">📚 {{entry.associatedBook.title}}</span>
-                <span *ngIf="entry.associatedBook.authors" class="entry-book-author">
-                  by {{entry.associatedBook.authors.join(', ')}}
-                </span>
+          <!-- Selected Book Display -->
+          <div *ngIf="currentEntry.associatedBook" class="selected-book">
+            <div class="book-info">
+              <img [src]="currentEntry.associatedBook.thumbnail || 'https://via.placeholder.com/60x90'" 
+                   [alt]="currentEntry.associatedBook.title" class="book-thumbnail">
+              <div class="book-details">
+                <h4>{{currentEntry.associatedBook.title}}</h4>
+                <p *ngIf="currentEntry.associatedBook.authors">{{getAuthorDisplay(currentEntry.associatedBook.authors)}}</p>
+                <p *ngIf="currentEntry.associatedBook.description" class="book-description">
+                  {{truncateDescription(currentEntry.associatedBook.description, 250)}}
+                </p>
               </div>
+              <button type="button" class="remove-book-btn" (click)="removeSelectedBook()">
+                ✕
+              </button>
             </div>
           </div>
-          
-          <div class="entry-meta">
-            <span class="entry-date">{{formatDate(entry.createdAt)}}</span>
-            <div class="entry-tags">
-              <span *ngFor="let tag of entry.tags" class="tag">{{tag}}</span>
-            </div>
-          </div>
-          
-          <div class="entry-content">
-            <p>{{entry.content}}</p>
-          </div>
-          
-          <div class="entry-actions">
-            <button class="edit-btn" (click)="editEntry(entry)">✏️ Edit</button>
-            <button class="delete-btn" (click)="deleteEntry(entry.id!)">
-              🗑️ Delete
+
+          <!-- Book Search Modal Trigger -->
+          <div class="book-search-controls">
+            <button type="button" class="btn btn-outline-primary" (click)="openBookModal()">
+              📚 {{currentEntry.associatedBook ? 'Change' : 'Select'}} Book
             </button>
           </div>
         </div>
+        
+        <div class="form-group">
+          <label for="tags">Tags (comma separated)</label>
+          <input 
+            type="text" 
+            id="tags"
+            [(ngModel)]="tagsString" 
+            name="tags"
+            class="form-control"
+            placeholder="work, family, travel">
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="!entryForm.valid">
+            {{editingEntry ? 'Update' : 'Save'}} Entry
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Quick Search and Entries List -->
+    <div class="entries-section">
+      <h3>📖 My Entries</h3>
+      
+      <!-- Quick Search -->
+      <div class="search-controls">
+        <div class="search-fields">
+          <div class="search-field">
+            <input 
+              type="text" 
+              placeholder="Quick search entries..." 
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+              (keyup.enter)="onSearch()"
+              class="form-control search-input">
+          </div>
+          <button class="btn btn-primary" (click)="onSearch()" [disabled]="loading">
+            {{loading ? 'Searching...' : 'Search'}}
+          </button>
+        </div>
+      </div>
+
+      <!-- Entries List -->
+      <div class="entries-list">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading entries...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && entries.length === 0" class="empty-state">
+          <div class="empty-icon">📖</div>
+          <h4>No entries found</h4>
+          <p>{{searchQuery ? 'Try different search terms.' : 'Your entries will appear here after you save them.'}}</p>
+        </div>
+
+        <!-- Entries Grid -->
+        <div *ngIf="!loading && entries.length > 0" class="entries-grid">
+          <div *ngFor="let entry of entries" class="entry-card">
+            <div class="entry-header">
+              <h4 class="entry-title">{{entry.title}}</h4>
+              <div class="entry-mood">
+                <span class="mood-display">
+                  {{getMoodDisplay(entry.mood).emoji}} {{getMoodDisplay(entry.mood).description}}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Associated Book Display -->
+            <div *ngIf="entry.associatedBook" class="entry-book">
+              <div class="book-reference">
+                <img [src]="entry.associatedBook.thumbnail || 'https://via.placeholder.com/40x60'" 
+                     [alt]="entry.associatedBook.title" class="entry-book-thumbnail">
+                <div class="entry-book-info">
+                  <span class="entry-book-title">📚 {{entry.associatedBook.title}}</span>
+                  <span *ngIf="entry.associatedBook.authors" class="entry-book-author">
+                    {{getAuthorDisplay(entry.associatedBook.authors)}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="entry-meta">
+              <span class="entry-date">{{formatDate(entry.createdAt)}}</span>
+              <div class="entry-tags">
+                <span *ngFor="let tag of entry.tags" class="tag">{{tag}}</span>
+              </div>
+            </div>
+            
+            <div class="entry-content">
+              <p>{{entry.content}}</p>
+            </div>
+            
+            <div class="entry-actions">
+              <button class="btn btn-sm btn-outline-primary" (click)="editEntry(entry)">✏️ Edit</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteEntry(entry.id!)">
+                🗑️ Delete
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Search Tab -->
+  <!-- Advanced Search Tab -->
   <div *ngIf="activeTab === 'search'" class="tab-content">
     <!-- Advanced Search Controls -->
     <div class="search-controls">
+      <h3>🔍 Advanced Search</h3>
       <div class="search-fields">
         <!-- Title Search -->
         <div class="search-field">
@@ -130,7 +212,7 @@
             [(ngModel)]="titleSearchQuery"
             (input)="onAdvancedSearch()"
             (keyup.enter)="onAdvancedSearch()"
-            class="search-input">
+            class="form-control">
         </div>
         
         <!-- Content Search -->
@@ -143,13 +225,13 @@
             [(ngModel)]="textSearchQuery"
             (input)="onAdvancedSearch()"
             (keyup.enter)="onAdvancedSearch()"
-            class="search-input">
+            class="form-control">
         </div>
         
         <!-- Mood Filter -->
         <div class="search-field">
           <label for="moodFilter">Filter by Mood:</label>
-          <select id="moodFilter" [(ngModel)]="filterMood" (change)="onAdvancedSearch()" class="search-input">
+          <select id="moodFilter" [(ngModel)]="filterMood" (change)="onAdvancedSearch()" class="form-control">
             <option [value]="null">All Moods</option>
             <option *ngFor="let mood of moods" [value]="mood">
               {{getMoodDisplay(mood).emoji}} {{getMoodDisplay(mood).description}}
@@ -157,7 +239,7 @@
           </select>
         </div>
         
-        <button class="search-btn" (click)="onAdvancedSearch()" [disabled]="loading">
+        <button class="btn btn-primary" (click)="onAdvancedSearch()" [disabled]="loading">
           {{loading ? 'Searching...' : 'Advanced Search'}}
         </button>
       </div>
@@ -174,20 +256,15 @@
       <!-- Empty State -->
       <div *ngIf="!loading && entries.length === 0" class="empty-state">
         <div class="empty-icon">🔍</div>
-        <h3>No entries found</h3>
+        <h4>No entries found</h4>
         <p>Try different search terms or check your filters.</p>
       </div>
 
       <!-- Results Grid -->
       <div *ngIf="!loading && entries.length > 0" class="entries-grid">
-        <div *ngIf="loading" class="loading">Loading entries...</div>
-        <div *ngIf="!loading && entries.length === 0" class="no-entries">
-          <p>No diary entries yet. Start writing your first entry!</p>
-        </div>
-        
         <div *ngFor="let entry of entries" class="entry-card">
           <div class="entry-header">
-            <h3 class="entry-title">{{entry.title}}</h3>
+            <h4 class="entry-title">{{entry.title}}</h4>
             <div class="entry-mood">
               <span class="mood-display">
                 {{getMoodDisplay(entry.mood).emoji}} {{getMoodDisplay(entry.mood).description}}
@@ -203,7 +280,7 @@
               <div class="entry-book-info">
                 <span class="entry-book-title">📚 {{entry.associatedBook.title}}</span>
                 <span *ngIf="entry.associatedBook.authors" class="entry-book-author">
-                  by {{entry.associatedBook.authors.join(', ')}}
+                  {{getAuthorDisplay(entry.associatedBook.authors)}}
                 </span>
               </div>
             </div>
@@ -221,8 +298,8 @@
           </div>
           
           <div class="entry-actions">
-            <button class="edit-btn" (click)="editEntry(entry)">✏️ Edit</button>
-            <button class="delete-btn" (click)="deleteEntry(entry.id!)">
+            <button class="btn btn-sm btn-outline-primary" (click)="editEntry(entry)">✏️ Edit</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteEntry(entry.id!)">
               🗑️ Delete
             </button>
           </div>
@@ -230,97 +307,81 @@
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Add/Edit Form Tab -->
-  <div *ngIf="(activeTab === 'add' && showAddForm) || editingEntry" class="tab-content">
-    <h3>{{editingEntry ? 'Edit Entry' : 'New Diary Entry'}}</h3>
-    <form (ngSubmit)="saveEntry()" #entryForm="ngForm">
-      <div class="form-group">
-        <label for="title">Title</label>
-        <input 
-          type="text" 
-          id="title"
-          [(ngModel)]="currentEntry.title" 
-          name="title"
-          required
-          class="form-control">
-      </div>
-      
-      <div class="form-group">
-        <label for="mood">How are you feeling?</label>
-        <div class="mood-selector">
-          <div 
-            *ngFor="let mood of moods" 
-            class="mood-option"
-            [class.selected]="currentEntry.mood === mood"
-            (click)="currentEntry.mood = mood">
-            <span class="mood-emoji">{{getMoodDisplay(mood).emoji}}</span>
-            <span class="mood-label">{{getMoodDisplay(mood).description}}</span>
-          </div>
+<!-- Book Selection Modal -->
+<div *ngIf="showBookModal" class="modal-overlay" (click)="closeBookModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>📚 Select a Book</h3>
+      <button class="btn-close" (click)="closeBookModal()">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Saved Books Section -->
+      <div class="saved-books-section">
+        <h4>📖 Your Saved Books</h4>
+        <div *ngIf="savedBooks.length === 0" class="no-books">
+          <p>No saved books yet. Search and save books from the Books tab first.</p>
         </div>
-      </div>
-      
-      <div class="form-group">
-        <label for="content">Content</label>
-        <textarea 
-          id="content"
-          [(ngModel)]="currentEntry.content" 
-          name="content"
-          required
-          rows="6"
-          class="form-control"
-          placeholder="Write about your day..."></textarea>
-      </div>
-      
-      <!-- Book Selection Section -->
-      <div class="form-group">
-        <label>Associated Book (Optional)</label>
-        
-        <!-- Selected Book Display -->
-        <div *ngIf="currentEntry.associatedBook" class="selected-book">
-          <div class="book-info">
-            <img [src]="currentEntry.associatedBook.thumbnail || 'https://via.placeholder.com/60x90'" 
-                 [alt]="currentEntry.associatedBook.title" class="book-thumbnail">
-            <div class="book-details">
-              <h4>{{currentEntry.associatedBook.title}}</h4>
-              <p *ngIf="currentEntry.associatedBook.authors">{{getAuthorDisplay(currentEntry.associatedBook.authors)}}</p>
-              <p *ngIf="currentEntry.associatedBook.description" class="book-description">
-                {{truncateDescription(currentEntry.associatedBook.description, 250)}}
-              </p>
+        <div *ngIf="savedBooks.length > 0" class="saved-books-grid">
+          <div *ngFor="let book of savedBooks" class="saved-book-item" (click)="selectBookFromModal(book)">
+            <img [src]="book.thumbnail || 'https://via.placeholder.com/40x60'" 
+                 [alt]="book.title" class="mini-thumbnail">
+            <div class="mini-book-info">
+              <span class="mini-title">{{book.title}}</span>
+              <span *ngIf="book.authors" class="mini-author">{{getAuthorDisplay(book.authors)}}</span>
             </div>
-            <button type="button" class="remove-book-btn" (click)="removeSelectedBook()">
-              ✕
-            </button>
           </div>
         </div>
-
-        <!-- Book Search Modal Trigger -->
-        <div class="book-search-controls">
-          <button type="button" class="search-books-btn" (click)="openBookModal()">
-            📚 {{currentEntry.associatedBook ? 'Change' : 'Select'}} Book
+      </div>
+      
+      <!-- Book Search Section -->
+      <div class="book-search-form">
+        <h4>🔍 Search New Books</h4>
+        <div class="book-search-inputs">
+          <input 
+            type="text" 
+            placeholder="Search by description..." 
+            [(ngModel)]="bookSearchQuery"
+            class="form-control">
+          <input 
+            type="text" 
+            placeholder="Search by title..." 
+            [(ngModel)]="bookTitleQuery"
+            class="form-control">
+          <input 
+            type="text" 
+            placeholder="Search by author..." 
+            [(ngModel)]="bookAuthorQuery"
+            class="form-control">
+          <button type="button" class="btn btn-primary" (click)="searchBooks()" [disabled]="isSearchingBooks">
+            {{isSearchingBooks ? 'Searching...' : 'Search'}}
           </button>
         </div>
       </div>
       
-      <div class="form-group">
-        <label for="tags">Tags (comma separated)</label>
-        <input 
-          type="text" 
-          id="tags"
-          [(ngModel)]="tagsString" 
-          name="tags"
-          class="form-control"
-          placeholder="work, family, travel">
+      <!-- Book Search Results -->
+      <div *ngIf="bookSearchResults.length > 0" class="book-results">
+        <h4>Search Results</h4>
+        <div class="book-results-grid">
+          <div *ngFor="let book of bookSearchResults" class="book-result-item" (click)="selectBookFromModal(book)">
+            <img [src]="book.thumbnail || 'https://via.placeholder.com/50x75'" 
+                 [alt]="book.title" class="result-thumbnail">
+            <div class="result-book-info">
+              <h5>{{book.title}}</h5>
+              <p *ngIf="book.authors">{{getAuthorDisplay(book.authors)}}</p>
+              <p *ngIf="book.description" class="result-description">
+                {{truncateDescription(book.description, 80)}}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <div class="form-actions">
-        <button type="submit" class="save-btn" [disabled]="!entryForm.valid">
-          {{editingEntry ? 'Update' : 'Save'}} Entry
-        </button>
-        <button type="button" class="cancel-btn" (click)="cancelEdit()">
-          Cancel
-        </button>
-      </div>
-    </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeBookModal()">Cancel</button>
+    </div>
   </div>
 </div>
