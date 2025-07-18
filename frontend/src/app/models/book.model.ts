@@ -11,5 +11,5 @@ export interface Book {
   categories?: string[];
   averageRating?: number;
   ratingsCount?: number;
-  isSaved?: boolean;
+  isSaved: boolean; // Remove the ? to make it required
 }

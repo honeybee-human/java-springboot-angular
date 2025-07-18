@@ -21,14 +21,14 @@ public class BookController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String subject,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "6") int size) { // Changed from 20 to 6
         return bookService.searchBooks(q, subject, page, size);
     }
     
     @GetMapping("/popular")
     public List<Book> getPopularBooks(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "6") int size) { // Changed from 20 to 6
         return bookService.getPopularBooks(page, size);
     }
     

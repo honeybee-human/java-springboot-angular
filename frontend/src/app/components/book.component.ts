@@ -21,7 +21,8 @@ export class BookComponent implements OnInit {
   
   // Pagination properties
   currentPage = 1;
-  pageSize = 20;
+  pageSize = 6; // Changed from 20 to 6
+  pageSizeOptions = [6, 9, 12]; // Add page size options
   totalResults = 0;
   totalPages = 0;
   isLoadingMore = false;
@@ -173,21 +174,26 @@ export class BookComponent implements OnInit {
   }
 
   saveBook(book: Book) {
-    this.bookService.saveBook(book).subscribe({
+    // Ensure isSaved is explicitly set
+    const bookToSave = { ...book, isSaved: true };
+    this.bookService.saveBook(bookToSave).subscribe({
       next: (savedBook) => {
         this.savedBooks.push(savedBook);
         const index = this.searchResults.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (index !== -1) {
           this.searchResults[index].isSaved = true;
         }
+        console.log('Book saved successfully:', savedBook);
       },
       error: (error) => {
         console.error('Error saving book:', error);
+        alert('Failed to save book. Please try again.');
       }
     });
   }
 
   saveFakeBook(book: Book) {
+    // Ensure isSaved is explicitly set
     const bookToSave = { ...book, isSaved: true };
     this.bookService.saveBook(bookToSave).subscribe({
       next: (savedBook) => {
@@ -196,9 +202,11 @@ export class BookComponent implements OnInit {
         if (index !== -1) {
           this.fakeBooks[index].isSaved = true;
         }
+        console.log('Fake book saved successfully:', savedBook);
       },
       error: (error) => {
         console.error('Error saving fake book:', error);
+        alert('Failed to save book. Please try again.');
       }
     });
   }
@@ -257,5 +265,18 @@ export class BookComponent implements OnInit {
 
   getPlaceholderImage(): string {
     return 'https://via.placeholder.com/128x192/f0f0f0/666?text=No+Image';
+  }
+
+  // Add new method to handle page size change
+  onPageSizeChange() {
+    this.currentPage = 1; // Reset to first page when changing page size
+    this.updatePagination(this.searchResults.length);
+    
+    // Reload current search/popular books with new page size
+    if (this.searchQuery.trim()) {
+      this.performSearch();
+    } else {
+      this.loadPopularBooks();
+    }
   }
 }

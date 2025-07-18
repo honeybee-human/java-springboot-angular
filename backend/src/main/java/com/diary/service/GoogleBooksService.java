@@ -36,9 +36,15 @@ public class GoogleBooksService {
                 url += "&key=" + apiKey;
             }
             
+            System.out.println("Google Books API URL: " + url); // Add this log
             String response = restTemplate.getForObject(url, String.class);
-            return parseGoogleBooksResponse(response);
+            System.out.println("Google Books API Response: " + response); // Add this log
+            
+            List<Book> books = parseGoogleBooksResponse(response);
+            System.out.println("Parsed books count: " + books.size()); // Add this log
+            return books;
         } catch (Exception e) {
+            System.err.println("Error searching books: " + e.getMessage());
             throw new RuntimeException("Error searching books: " + e.getMessage());
         }
     }
@@ -46,16 +52,25 @@ public class GoogleBooksService {
     public List<Book> getPopularBooks(int page, int size) {
         try {
             int startIndex = page * size;
-            String url = "https://www.googleapis.com/books/v1/volumes?q=subject:self-help+OR+subject:motivation+OR+subject:psychology"
-                       + "&orderBy=relevance&maxResults=" + size + "&startIndex=" + startIndex;
+            // Use a broader, more reliable query that will return more results
+            String url = "https://www.googleapis.com/books/v1/volumes?q=wellness+OR+self-help+OR+motivation+OR+psychology+OR+productivity"
+                       + "&orderBy=relevance&maxResults=" + size + "&startIndex=" + startIndex
+                       + "&printType=books&langRestrict=en";
             
             if (!apiKey.isEmpty()) {
                 url += "&key=" + apiKey;
             }
             
+            System.out.println("Popular Books API URL: " + url);
             String response = restTemplate.getForObject(url, String.class);
-            return parseGoogleBooksResponse(response);
+            System.out.println("API Response received, length: " + (response != null ? response.length() : "null"));
+            
+            List<Book> books = parseGoogleBooksResponse(response);
+            System.out.println("Parsed books count: " + books.size());
+            return books;
         } catch (Exception e) {
+            System.err.println("Error fetching popular books: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Error fetching popular books: " + e.getMessage());
         }
     }
@@ -65,15 +80,16 @@ public class GoogleBooksService {
         
         if (query != null && !query.trim().isEmpty()) {
             searchQuery.append(query.trim().replace(" ", "+"));
+        } else {
+            // Default broad search when no specific query
+            searchQuery.append("wellness+OR+self-help+OR+motivation+OR+psychology");
         }
         
         if (subject != null && !subject.trim().isEmpty() && WELLNESS_SUBJECTS.contains(subject.toLowerCase())) {
-            if (searchQuery.length() > 0) {
-                searchQuery.append("+");
-            }
-            searchQuery.append("subject:").append(subject.replace(" ", "+"));
+            searchQuery.append("+subject:").append(subject.replace(" ", "+"));
         }
         
+        System.out.println("Built search query: " + searchQuery.toString());
         return searchQuery.toString();
     }
     

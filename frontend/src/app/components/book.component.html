@@ -38,6 +38,11 @@
             {{subject}}
           </option>
         </select>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-filter">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">
+            {{size}} per page
+          </option>
+        </select>
         <button class="search-btn" (click)="searchBooks()" [disabled]="isSearching">
           {{isSearching ? 'Searching...' : 'Search'}}
         </button>
@@ -68,24 +73,14 @@
           <div class="book-details">
             <h3 class="book-title">{{book.title}}</h3>
             <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
+            <!-- Fix for line 78 - Search Results Authors -->
             <p class="book-authors" *ngIf="book.authors?.length">
-              by {{book.authors.join(', ')}}
+              by {{book.authors?.join(', ')}}
             </p>
-            <p class="book-publisher" *ngIf="book.publisher">
-              {{book.publisher}}
-              <span *ngIf="book.publishedDate"> • {{book.publishedDate}}</span>
-            </p>
-            <div class="book-rating" *ngIf="book.averageRating">
-              <span class="stars">{{getStars(book.averageRating)}}</span>
-              <span class="rating-text">
-                {{book.averageRating}}/5 ({{book.ratingsCount || 0}} reviews)
-              </span>
-            </div>
-            <p class="book-description" *ngIf="book.description">
-              {{truncateDescription(book.description)}}
-            </p>
+            
+            <!-- Fix for line 83 - Search Results Categories -->
             <div class="book-categories" *ngIf="book.categories?.length">
-              <span *ngFor="let category of book.categories.slice(0, 3)" class="category-tag">
+              <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
                 {{category}}
               </span>
             </div>
@@ -117,8 +112,7 @@
       <!-- Pagination -->
       <div *ngIf="!isSearching && searchResults.length > 0 && totalPages > 1" class="pagination">
         <div class="pagination-info">
-          Showing page {{currentPage}} of {{totalPages}} 
-          <span *ngIf="totalResults > 0">({{totalResults}} results)</span>
+          Showing {{((currentPage - 1) * pageSize) + 1}}-{{Math.min(currentPage * pageSize, totalResults)}} of {{totalResults}} results ({{pageSize}} per page)
         </div>
         
         <div class="pagination-controls">
@@ -197,24 +191,26 @@
         <div class="book-details">
           <h3 class="book-title">{{book.title}}</h3>
           <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
+          <!-- Fix for line 196 - Collection Authors -->
           <p class="book-authors" *ngIf="book.authors?.length">
-            by {{book.authors.join(', ')}}
+            by {{book.authors?.join(', ')}}
           </p>
-          <p class="book-publisher" *ngIf="book.publisher">
-            {{book.publisher}}
-            <span *ngIf="book.publishedDate"> • {{book.publishedDate}}</span>
-          </p>
-          <div class="book-rating" *ngIf="book.averageRating">
-            <span class="stars">{{getStars(book.averageRating)}}</span>
-            <span class="rating-text">
-              {{book.averageRating}}/5 ({{book.ratingsCount || 0}} reviews)
+          
+          <!-- Fix for line 201 - Collection Categories -->
+          <div class="book-categories" *ngIf="book.categories?.length">
+            <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
+              {{category}}
             </span>
           </div>
-          <p class="book-description" *ngIf="book.description">
-            {{truncateDescription(book.description)}}
+          
+          <!-- Fix for line 239 - Practice Books Authors -->
+          <p class="book-authors" *ngIf="book.authors?.length">
+            by {{book.authors?.join(', ')}}
           </p>
+          
+          <!-- Fix for line 244 - Practice Books Categories -->
           <div class="book-categories" *ngIf="book.categories?.length">
-            <span *ngFor="let category of book.categories.slice(0, 3)" class="category-tag">
+            <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
               {{category}}
             </span>
           </div>
@@ -250,24 +246,14 @@
         <div class="book-details">
           <h3 class="book-title">{{book.title}}</h3>
           <p class="book-subtitle" *ngIf="book.subtitle">{{book.subtitle}}</p>
+          <!-- Fix for line 251 - Practice Books Authors -->
           <p class="book-authors" *ngIf="book.authors?.length">
-            by {{book.authors.join(', ')}}
+            by {{book.authors?.join(', ')}}
           </p>
-          <p class="book-publisher" *ngIf="book.publisher">
-            {{book.publisher}}
-            <span *ngIf="book.publishedDate"> • {{book.publishedDate}}</span>
-          </p>
-          <div class="book-rating" *ngIf="book.averageRating">
-            <span class="stars">{{getStars(book.averageRating)}}</span>
-            <span class="rating-text">
-              {{book.averageRating}}/5 ({{book.ratingsCount || 0}} reviews)
-            </span>
-          </div>
-          <p class="book-description" *ngIf="book.description">
-            {{truncateDescription(book.description)}}
-          </p>
+          
+          <!-- Fix for line 256 - Practice Books Categories -->
           <div class="book-categories" *ngIf="book.categories?.length">
-            <span *ngFor="let category of book.categories.slice(0, 3)" class="category-tag">
+            <span *ngFor="let category of book.categories?.slice(0, 3)" class="category-tag">
               {{category}}
             </span>
           </div>
