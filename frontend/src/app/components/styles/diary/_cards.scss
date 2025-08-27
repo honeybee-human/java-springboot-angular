@@ -67,7 +67,6 @@
   color: #444;
 }
 
-// Mood tags with light blue background
 .mood-tag {
   background-color: $mood-tag-bg;
   color: $mood-tag-color;
@@ -78,7 +77,6 @@
   display: inline-block;
 }
 
-// Entry action buttons with white backgrounds
 .entry-actions {
   display: flex;
   gap: $spacing-sm;

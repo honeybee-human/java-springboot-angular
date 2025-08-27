@@ -16,7 +16,6 @@ export class DiaryComponent implements OnInit {
   showAddForm = false;
   editingEntry: DiaryEntry | null = null;
   
-  // Modal and success message properties
   showNewEntryModal: boolean = false;
   showSuccessMessage: boolean = false;
   successMessage: string = '';
@@ -276,7 +275,7 @@ export class DiaryComponent implements OnInit {
     return description.length > maxLength ? description.substring(0, maxLength) + '...' : description;
   }
   
-  activeTab: string = 'add';
+  activeTab: string = 'entries';
   
   setActiveTab(tab: string) {
     this.activeTab = tab;
@@ -303,7 +302,6 @@ export class DiaryComponent implements OnInit {
     this.closeBookModal();
   }
   
-  // Modal methods
   openNewEntryModal() {
     this.showNewEntryModal = true;
     this.editingEntry = null;
@@ -321,7 +319,6 @@ export class DiaryComponent implements OnInit {
     this.cancelEdit();
   }
   
-  // Success message method
   showSuccess(message: string) {
     this.successMessage = message;
     this.showSuccessMessage = true;

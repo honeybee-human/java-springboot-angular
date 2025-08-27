@@ -20,7 +20,6 @@ export class BookComponent implements OnInit {
   isLoadingCollection = false;
   hasSearched = false;
   
-  // Success message properties
   showSuccessMessage: boolean = false;
   successMessage: string = '';
   
@@ -344,7 +343,6 @@ export class BookComponent implements OnInit {
     });
   }
   
-  // Success message method
   showSuccess(message: string) {
     this.successMessage = message;
     this.showSuccessMessage = true;

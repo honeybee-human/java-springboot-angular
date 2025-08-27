@@ -1,4 +1,3 @@
-// Button mixin
 @mixin button-base {
   padding: $spacing-md $spacing-2xl;
   border: 2px solid;
@@ -76,7 +75,6 @@
   }
 }
 
-// Input mixin
 @mixin input-base {
   padding: $spacing-md $spacing-lg;
   border: 2px solid $border-color;
@@ -92,7 +90,6 @@
   }
 }
 
-// Card hover effect
 @mixin card-hover {
   transition: $transition-smooth;
   
@@ -102,7 +99,6 @@
   }
 }
 
-// Text truncation
 @mixin text-truncate($lines: 1) {
   display: -webkit-box;
   -webkit-line-clamp: $lines;
@@ -110,7 +106,6 @@
   overflow: hidden;
 }
 
-// Gradient text
 @mixin gradient-text {
   background: linear-gradient(135deg, $primary-color, $secondary-color);
   -webkit-background-clip: text;
@@ -118,7 +113,6 @@
   background-clip: text;
 }
 
-// Media queries
 @mixin mobile {
   @media (max-width: $breakpoint-md) {
     @content;
