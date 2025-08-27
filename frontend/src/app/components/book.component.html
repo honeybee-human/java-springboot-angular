@@ -1,5 +1,4 @@
 <div class="book-container">
-  <!-- Tab Navigation -->
   <div class="tab-navigation">
     <button 
       class="tab-btn" 
@@ -21,16 +20,11 @@
     </button>
   </div>
 
-  <!-- Search Tab -->
   <div *ngIf="activeTab === 'search'" class="tab-content">
-    <!-- Multiple Search Fields -->
     <div class="search-controls modern-search">
-      <div class="section-header">
-        <h3>🔍 Search Books</h3>
-      </div>
+
       
       <div class="search-fields-container">
-        <!-- Title and Author Row -->
         <div class="search-row">
           <div class="search-field">
             <label for="titleSearch">Search by Title:</label>
@@ -55,7 +49,6 @@
           </div>
         </div>
         
-        <!-- Description Row -->
         <div class="search-row">
           <div class="search-field full-width">
             <label for="descriptionSearch">Search by Description:</label>
@@ -69,7 +62,6 @@
           </div>
         </div>
         
-        <!-- Books per page and Search Button Row -->
         <div class="search-row filter-row">
           <div class="search-field books-per-page">
             <label for="pageSize">Books per page:</label>
@@ -90,22 +82,18 @@
       </div>
     </div>
 
-    <!-- Search Results -->
     <div class="search-results">
-      <!-- Loading State -->
       <div *ngIf="isSearching" class="loading-state">
         <div class="loading-spinner"></div>
         <p>Searching for books...</p>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="!isSearching && hasSearched && searchResults.length === 0" class="empty-state">
         <div class="empty-icon">📚</div>
         <h3>No books found</h3>
         <p>Try different search terms or browse our popular books.</p>
       </div>
 
-      <!-- Results Grid -->
       <div *ngIf="!isSearching && searchResults.length > 0" class="books-grid">
         <div *ngFor="let book of displayedSearchResults" class="book-card">
           <div class="book-image">
@@ -126,7 +114,7 @@
                 *ngIf="!book.isSaved" 
                 class="save-btn" 
                 (click)="saveBook(book)">
-                💾 Save to Collection
+                💾 Save
               </button>
               <button 
                 *ngIf="book.isSaved" 
@@ -146,7 +134,6 @@
         </div>
       </div>
 
-      <!-- Pagination -->
       <div *ngIf="!isSearching && searchResults.length > 0 && totalPages > 1" class="pagination">
         <div class="pagination-info">
           Showing {{((currentPage - 1) * pageSize) + 1}}-{{Math.min(currentPage * pageSize, totalResults)}} of {{totalResults}} results ({{pageSize}} per page)
@@ -192,20 +179,14 @@
     </div>
   </div>
 
-  <!-- Collection Tab -->
   <div *ngIf="activeTab === 'collection'" class="tab-content">
-    <div class="collection-header">
-      <h2>📚 My Book Collection</h2>
-      <p>Books you've saved for later reading</p>
-    </div>
+   
 
-    <!-- Loading State -->
     <div *ngIf="isLoadingCollection" class="loading-state">
       <div class="loading-spinner"></div>
       <p>Loading your collection...</p>
     </div>
 
-    <!-- Empty Collection -->
     <div *ngIf="!isLoadingCollection && savedBooks.length === 0" class="empty-state">
       <div class="empty-icon">📚</div>
       <h3>Your collection is empty</h3>
@@ -215,7 +196,6 @@
       </button>
     </div>
 
-    <!-- Collection Grid -->
     <div *ngIf="!isLoadingCollection && savedBooks.length > 0" class="books-grid">
       <div *ngFor="let book of savedBooks" class="book-card">
         <div class="book-image">
@@ -248,12 +228,7 @@
     </div>
   </div>
 
-  <!-- Practice Tab -->
   <div *ngIf="activeTab === 'practice'" class="tab-content">
-    <div class="practice-header">
-      <h2>🌟 Practice with Sample Books</h2>
-      <p>Explore these curated books to test the app features</p>
-    </div>
 
     <div class="books-grid">
       <div *ngFor="let book of fakeBooks" class="book-card">
@@ -275,7 +250,7 @@
               *ngIf="!checkSavedStatus(book)" 
               class="save-btn" 
               (click)="saveFakeBook(book)">
-              💾 Save to Collection
+              💾 Save
             </button>
             <button 
               *ngIf="checkSavedStatus(book)" 
@@ -296,7 +271,6 @@
     </div>
   </div>
 
-<!-- Success Snackbar -->
 <div *ngIf="showSuccessMessage" class="snackbar success-snackbar" [class.show]="showSuccessMessage">
   <div class="snackbar-content">
     <span class="snackbar-icon">⭐</span>

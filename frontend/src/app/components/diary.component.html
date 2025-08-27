@@ -1,5 +1,4 @@
 <div class="diary-container">
-  <!-- Tab Navigation -->
   <div class="tab-navigation">
     <button 
       class="tab-btn" 
@@ -15,19 +14,9 @@
     </button>
   </div>
 
-  <!-- Entries Tab -->
   <div *ngIf="activeTab === 'entries'" class="tab-content">
-    <!-- Add New Entry Button -->
-    <div class="entries-header">
-      <div class="section-header">
-        <h3>📖 My Entries</h3>
-      </div>
-      <button class="btn btn-primary add-entry-btn" (click)="openNewEntryModal()">
-        ✏️ New Entry
-      </button>
-    </div>
-    
-    <!-- Quick Search -->
+
+
     <div class="search-controls modern-search">
       <div class="search-row">
         <div class="search-input-group">
@@ -41,26 +30,25 @@
           <button class="btn btn-primary search-btn" (click)="onSearch()" [disabled]="loading">
             {{loading ? '🔍 Searching...' : '🔍 Search'}}
           </button>
+          <button class="btn btn-primary add-entry-btn" (click)="openNewEntryModal()">
+        ✏️ New Entry
+      </button>
         </div>
       </div>
     </div>
 
-    <!-- Entries List -->
     <div class="entries-list">
-      <!-- Loading State -->
       <div *ngIf="loading" class="loading-state">
         <div class="loading-spinner"></div>
         <p>Loading entries...</p>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="!loading && entries.length === 0" class="empty-state">
         <div class="empty-icon">📖</div>
         <h4>No entries found</h4>
         <p>{{searchQuery ? 'Try different search terms.' : 'Click "New Entry" to create your first diary entry.'}}</p>
       </div>
 
-      <!-- Entries Grid -->
       <div *ngIf="!loading && entries.length > 0" class="entries-grid">
         <div *ngFor="let entry of entries" class="entry-card">
           <div class="entry-header">
@@ -72,7 +60,6 @@
             </div>
           </div>
           
-          <!-- Associated Book Display -->
           <div *ngIf="entry.associatedBook" class="entry-book">
             <div class="book-reference">
               <img [src]="entry.associatedBook.thumbnail || 'https://via.placeholder.com/40x60'" 
@@ -108,16 +95,11 @@
     </div>
   </div>
 
-  <!-- Advanced Search Tab -->
   <div *ngIf="activeTab === 'search'" class="tab-content">
-    <!-- Advanced Search Controls -->
     <div class="search-controls advanced-search">
-      <div class="section-header">
-        <h3>🔍 Advanced Search</h3>
-      </div>
+ 
       
       <div class="search-fields-container">
-        <!-- Title and Content Search Row -->
         <div class="search-row">
           <div class="search-field">
             <label for="titleSearch">Search by Title:</label>
@@ -144,7 +126,6 @@
           </div>
         </div>
         
-        <!-- Mood Filter and Search Button Row -->
         <div class="search-row filter-row">
           <div class="search-field mood-filter">
             <label for="moodFilter">Filter by Mood:</label>
@@ -165,22 +146,18 @@
       </div>
     </div>
 
-    <!-- Search Results -->
     <div class="search-results">
-      <!-- Loading State -->
       <div *ngIf="loading" class="loading-state">
         <div class="loading-spinner"></div>
         <p>Searching entries...</p>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="!loading && entries.length === 0" class="empty-state">
         <div class="empty-icon">🔍</div>
         <h4>No entries found</h4>
         <p>Try different search terms or check your filters.</p>
       </div>
 
-      <!-- Results Grid -->
       <div *ngIf="!loading && entries.length > 0" class="entries-grid">
         <div *ngFor="let entry of entries" class="entry-card">
           <div class="entry-header">
@@ -192,7 +169,6 @@
             </div>
           </div>
           
-          <!-- Associated Book Display -->
           <div *ngIf="entry.associatedBook" class="entry-book">
             <div class="book-reference">
               <img [src]="entry.associatedBook.thumbnail || 'https://via.placeholder.com/40x60'" 
@@ -229,7 +205,6 @@
   </div>
 </div>
 
-<!-- New Entry Modal -->
 <div *ngIf="showNewEntryModal" class="modal-overlay" (click)="closeNewEntryModal()">
   <div class="modal-content entry-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -239,7 +214,6 @@
     
     <div class="modal-body">
       <form (ngSubmit)="saveEntry()" #entryForm="ngForm">
-        <!-- Title and Mood Row -->
         <div class="form-row">
           <div class="form-group">
             <label for="title">Title</label>
@@ -281,11 +255,9 @@
             placeholder="Write about your day, thoughts, experiences..."></textarea>
         </div>
         
-        <!-- Book Selection Section -->
         <div class="form-group">
           <label>Associated Book (Optional)</label>
           
-          <!-- Selected Book Display -->
           <div *ngIf="currentEntry.associatedBook" class="selected-book">
             <div class="book-info">
               <img [src]="currentEntry.associatedBook.thumbnail || 'https://via.placeholder.com/60x90'" 
@@ -303,7 +275,6 @@
             </div>
           </div>
 
-          <!-- Book Search Modal Trigger -->
           <div class="book-search-controls">
             <button type="button" class="btn btn-outline-primary" (click)="openBookModal()">
               📚 {{currentEntry.associatedBook ? 'Change' : 'Select'}} Book
@@ -335,7 +306,6 @@
   </div>
 </div>
 
-<!-- Book Selection Modal -->
 <div *ngIf="showBookModal" class="modal-overlay" (click)="closeBookModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -344,7 +314,6 @@
     </div>
     
     <div class="modal-body">
-      <!-- Saved Books Section -->
       <div class="saved-books-section">
         <h4>📖 Your Saved Books</h4>
         <div *ngIf="savedBooks.length === 0" class="no-books">
@@ -362,11 +331,9 @@
         </div>
       </div>
       
-      <!-- Book Search Section -->
       <div class="book-search-form">
         <h4>🔍 Search New Books</h4>
         <div class="book-search-container">
-          <!-- Title and Author Row -->
           <div class="search-row">
             <div class="search-field">
               <label>Title:</label>
@@ -386,7 +353,6 @@
             </div>
           </div>
           
-          <!-- Description Row -->
           <div class="search-row">
             <div class="search-field full-width">
               <label>Description:</label>
@@ -398,7 +364,6 @@
             </div>
           </div>
           
-          <!-- Books per page and Search Button Row -->
           <div class="search-row filter-row">
             <div class="search-field books-per-page">
               <label>Books per page:</label>
@@ -419,7 +384,6 @@
         </div>
       </div>
       
-      <!-- Book Search Results -->
       <div *ngIf="bookSearchResults.length > 0" class="book-results">
         <h4>Search Results</h4>
         <div class="book-results-grid">
@@ -444,7 +408,6 @@
   </div>
 </div>
 
-<!-- Success Snackbar -->
 <div *ngIf="showSuccessMessage" class="snackbar success-snackbar" [class.show]="showSuccessMessage">
   <div class="snackbar-content">
     <span class="snackbar-icon">✅</span>

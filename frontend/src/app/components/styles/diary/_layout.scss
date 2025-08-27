@@ -129,6 +129,7 @@
   }
   
   .search-btn {
+    @include button-primary;
     white-space: nowrap;
     padding: 0 $spacing-xl;
   }
@@ -141,5 +142,43 @@
     width: 80px;
     display: inline-block;
     margin-left: $spacing-sm;
+  }
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: $gray-600;
+  font-size: 1.1rem;
+  font-weight: $font-weight-semibold;
+  padding: 0.75rem 1.5rem 0.5rem 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: -2px;
+  &.active {
+    color: $primary-color;
+    border-bottom: 3px solid $primary-color;
+    background: $background-light;
+  }
+  &:hover:not(.active) {
+    color: $primary-color;
+    background: $gray-100;
+  }
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: $gray-500;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+    &:hover, &:focus {
+      background: $gray-100;
+      color: $danger-color;
+      outline: none;
+    }
   }
 }

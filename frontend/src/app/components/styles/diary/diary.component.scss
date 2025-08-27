@@ -1,9 +1,10 @@
-@import "variables";
-@import "mixins";
-@import "animations";
+@import "../sharedVariables";
+@import "../sharedStates";
+@import "../sharedMixins";
+@import "../sharedAnimations";
+
 @import "layout";
 @import "forms";
 @import "buttons";
 @import "cards";
 @import "modals";
-@import "states";

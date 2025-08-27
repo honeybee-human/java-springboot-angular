@@ -120,16 +120,11 @@ export class DiaryComponent implements OnInit {
   }
 
   deleteEntry(id: number) {
-    if (confirm('Are you sure you want to delete this entry?')) {
       this.diaryService.deleteEntry(id).subscribe({
         next: () => {
           this.entries = this.entries.filter(e => e.id !== id);
-        },
-        error: (error) => {
-          console.error('Error deleting entry:', error);
         }
-      });
-    }
+    })
   }
 
   cancelEdit() {

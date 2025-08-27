@@ -17,7 +17,7 @@
   color: $primary-color;
   border-color: $primary-color;
   
-  &:hover:not(:disabled) {
+  &:hover {
     background: $primary-light;
     border-color: $primary-hover;
     color: $primary-hover;
@@ -28,82 +28,97 @@
     color: white;
     border-color: $primary-color;
   }
-  
-  &:disabled {
-    background: $gray-100;
-    color: $gray-300;
-    border-color: $gray-200;
-    cursor: not-allowed;
-  }
 }
 
 @mixin button-success {
   @include button-base;
-  color: $success-color;
+  background: $success-color;
+  color: white;
   border-color: $success-color;
-  background: white;
   
   &:hover {
-    background: $success-light;
+    background: $success-hover;
     border-color: $success-hover;
   }
 }
 
 @mixin button-danger {
   @include button-base;
-  color: $danger-color;
+  background: $danger-color;
+  color: white;
   border-color: $danger-color;
-  background: white;
   
   &:hover {
-    background: $danger-light;
+    background: $danger-hover;
     border-color: $danger-hover;
   }
 }
 
 @mixin button-info {
   @include button-base;
-  color: $info-color;
+  background: $info-color;
+  color: white;
   border-color: $info-color;
-  background: white;
   
   &:hover {
-    background: $info-light;
+    background: $info-hover;
     border-color: $info-hover;
-    text-decoration: none;
-    color: $info-hover;
   }
 }
 
-@mixin input-base {
-  padding: $spacing-md $spacing-lg;
+@mixin button-solid($color, $hover-color) {
+  @include button-base;
+  background: $color;
+  color: white;
+  border: none;
+  
+  &:hover:not(:disabled) {
+    background: $hover-color;
+  }
+  
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-outline($color, $hover-color) {
+  color: $color;
+  border-color: $color;
+  
+  &:hover {
+    background-color: $color;
+    color: white;
+  }
+}
+
+@mixin form-control {
+  width: 100%;
+  padding: $spacing-md;
   border: 2px solid $border-color;
   border-radius: $border-radius-md;
   font-size: $font-size-base;
-  transition: $transition-fast;
-  background: white;
+  transition: border-color $transition-fast;
+  box-sizing: border-box;
   
   &:focus {
     outline: none;
     border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   }
 }
 
 @mixin card-hover {
-  transition: $transition-smooth;
+  transition: transform $transition-fast;
   
   &:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: $shadow-2xl;
+    transform: translateY(-2px);
   }
 }
 
-@mixin text-truncate($lines: 1) {
-  display: -webkit-box;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+@mixin mobile {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
 }
 
 @mixin gradient-text {
@@ -113,15 +128,27 @@
   background-clip: text;
 }
 
-@mixin mobile {
-  @media (max-width: $breakpoint-md) {
-    @content;
-  }
+@mixin text-truncate($lines: 1) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-@mixin tablet {
-  @media (max-width: $breakpoint-lg) {
-    @content;
+@mixin input-base {
+  width: 100%;
+  padding: $spacing-md;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-size-base;
+  transition: border-color $transition-fast;
+  box-sizing: border-box;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
   }
 }
 
