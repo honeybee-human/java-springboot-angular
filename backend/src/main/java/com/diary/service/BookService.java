@@ -27,7 +27,6 @@ public class BookService {
     }
     
     public Book saveBook(Book book) {
-        // Validate required fields
         if (book.getGoogleBooksId() == null || book.getGoogleBooksId().trim().isEmpty()) {
             throw new IllegalArgumentException("Google Books ID is required");
         }
@@ -36,7 +35,6 @@ public class BookService {
             throw new IllegalArgumentException("Book title is required");
         }
         
-        // Set default values for null fields to prevent database issues
         if (book.getAuthors() == null) {
             book.setAuthors(List.of("Unknown Author"));
         }
@@ -69,16 +67,13 @@ public class BookService {
             book.setSubtitle("");
         }
         
-        // Check if book already exists
         Optional<Book> existingBook = bookRepository.findByGoogleBooksId(book.getGoogleBooksId());
         
         if (existingBook.isPresent()) {
-            // Update existing book to mark as saved
             Book existing = existingBook.get();
             existing.setIsSaved(true);
             return bookRepository.save(existing);
         } else {
-            // Save new book
             book.setIsSaved(true);
             return bookRepository.save(book);
         }

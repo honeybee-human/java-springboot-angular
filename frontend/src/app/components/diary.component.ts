@@ -16,15 +16,13 @@ export class DiaryComponent implements OnInit {
   showAddForm = false;
   editingEntry: DiaryEntry | null = null;
   
-  // Enhanced search properties
   searchQuery = '';
   titleSearchQuery = '';
   textSearchQuery = '';
-  filterMood: Mood | null = null; // Changed from string to Mood | null
+  filterMood: Mood | null = null;
   
-  // Book search properties
   showBookSearch = false;
-  showBookModal = false; // Add this new property
+  showBookModal = false;
   bookSearchResults: Book[] = [];
   savedBooks: Book[] = [];
   bookSearchQuery = '';
@@ -141,7 +139,6 @@ export class DiaryComponent implements OnInit {
     this.showBookSearch = false;
   }
 
-  // Enhanced search methods
   onSearch() {
     if (this.searchQuery.trim()) {
       this.diaryService.searchEntries(this.searchQuery).subscribe({
@@ -158,9 +155,8 @@ export class DiaryComponent implements OnInit {
   }
 
   onAdvancedSearch() {
-    // Implement advanced search combining title, text, and mood
     const searchTerm = this.titleSearchQuery || this.textSearchQuery || '';
-    const mood = this.filterMood; // No need for || null since it's already Mood | null
+    const mood = this.filterMood;
     
     if (searchTerm.trim() || mood) {
       this.diaryService.searchByTextAndMood(searchTerm, mood).subscribe({
@@ -178,7 +174,7 @@ export class DiaryComponent implements OnInit {
 
   onMoodFilter() {
     if (this.filterMood) {
-      this.diaryService.getEntriesByMood(this.filterMood).subscribe({ // No need for 'as Mood' cast
+      this.diaryService.getEntriesByMood(this.filterMood).subscribe({
         next: (entries) => {
           this.entries = entries;
         },
@@ -191,7 +187,6 @@ export class DiaryComponent implements OnInit {
     }
   }
 
-  // Book search methods
   toggleBookSearch() {
     this.showBookSearch = !this.showBookSearch;
     if (this.showBookSearch) {
@@ -251,7 +246,6 @@ export class DiaryComponent implements OnInit {
     });
   }
 
-  // Add helper methods for book display
   getAuthorDisplay(authors: string[] | undefined): string {
     if (!authors || authors.length === 0) {
       return 'Unknown Author';
@@ -265,7 +259,6 @@ export class DiaryComponent implements OnInit {
       return `by ${authors[0]} and ${authors[1]}`;
     }
     
-    // For more than 2 authors, show first two + count
     const remainingCount = authors.length - 2;
     return `by ${authors[0]}, ${authors[1]} +${remainingCount} more`;
   }
@@ -275,22 +268,18 @@ export class DiaryComponent implements OnInit {
     return description.length > maxLength ? description.substring(0, maxLength) + '...' : description;
   }
   
-  // Add tab navigation properties
-  activeTab: string = 'add'; // Changed default to 'add'
+  activeTab: string = 'add';
   
-  // Add tab navigation method
   setActiveTab(tab: string) {
     this.activeTab = tab;
     if (tab === 'add') {
-      this.loadEntries(); // Load entries when switching to add tab
+      this.loadEntries();
     }
   }
 
-  // Book modal methods - Add these inside the class
   openBookModal() {
     this.showBookModal = true;
     this.loadSavedBooks();
-    // Clear previous search results
     this.bookSearchResults = [];
     this.bookSearchQuery = '';
     this.bookTitleQuery = '';

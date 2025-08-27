@@ -9,7 +9,6 @@ import { FAKE_BOOKS } from '../data/fake-books.data';
   styleUrls: ['./book.component.scss']
 })
 export class BookComponent implements OnInit {
-  // Separate search queries
   descriptionQuery = '';
   titleQuery = '';
   authorQuery = '';
@@ -21,13 +20,11 @@ export class BookComponent implements OnInit {
   isLoadingCollection = false;
   hasSearched = false;
   
-  // Pagination properties
   currentPage = 1;
   pageSize = 16;
   totalResults = 0;
   totalPages = 0;
   
-  // Practice books
   fakeBooks = FAKE_BOOKS;
   Math = Math;
 
@@ -181,7 +178,6 @@ export class BookComponent implements OnInit {
   }
 
   saveBook(book: Book) {
-    // Create a clean book object with all required fields and proper defaults
     const bookToSave: Book = {
       googleBooksId: book.googleBooksId || `temp_${Date.now()}`,
       title: book.title || 'Unknown Title',
@@ -198,7 +194,6 @@ export class BookComponent implements OnInit {
       isSaved: true
     };
 
-    // Validate required fields
     if (!bookToSave.googleBooksId || !bookToSave.title) {
       console.error('Cannot save book: missing required fields');
       alert('Cannot save book: missing required information');
@@ -207,13 +202,11 @@ export class BookComponent implements OnInit {
 
     this.bookService.saveBook(bookToSave).subscribe({
       next: (savedBook) => {
-        // Check if book is already in savedBooks to avoid duplicates
         const existingIndex = this.savedBooks.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (existingIndex === -1) {
           this.savedBooks.push(savedBook);
         }
         
-        // Update the search results to show as saved
         const index = this.searchResults.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (index !== -1) {
           this.searchResults[index].isSaved = true;
@@ -224,7 +217,6 @@ export class BookComponent implements OnInit {
       error: (error) => {
         console.error('Error saving book:', error);
         
-        // Show detailed error message to user
         let errorMessage = 'Failed to save book. ';
         if (error.error && error.error.error) {
           errorMessage += error.error.error;
@@ -279,7 +271,6 @@ export class BookComponent implements OnInit {
     return description.length > maxLength ? description.substring(0, maxLength) + '...' : description;
   }
 
-  // Add new method for author display
   getAuthorDisplay(authors: string[] | undefined): string {
     if (!authors || authors.length === 0) {
       return 'Unknown Author';
@@ -293,7 +284,6 @@ export class BookComponent implements OnInit {
       return `by ${authors[0]} and ${authors[1]}`;
     }
     
-    // For more than 2 authors, show first two + count
     const remainingCount = authors.length - 2;
     return `by ${authors[0]}, ${authors[1]} +${remainingCount} more`;
   }
@@ -303,7 +293,6 @@ export class BookComponent implements OnInit {
   }
 
   saveFakeBook(book: Book) {
-    // Create a clean book object with all required fields and proper defaults
     const bookToSave: Book = {
       googleBooksId: book.googleBooksId || `fake_${Date.now()}`,
       title: book.title || 'Unknown Title',
@@ -322,13 +311,11 @@ export class BookComponent implements OnInit {
 
     this.bookService.saveBook(bookToSave).subscribe({
       next: (savedBook) => {
-        // Check if book is already in savedBooks to avoid duplicates
         const existingIndex = this.savedBooks.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (existingIndex === -1) {
           this.savedBooks.push(savedBook);
         }
         
-        // Update the fake books to show as saved
         const index = this.fakeBooks.findIndex(b => b.googleBooksId === book.googleBooksId);
         if (index !== -1) {
           this.fakeBooks[index].isSaved = true;
@@ -339,7 +326,6 @@ export class BookComponent implements OnInit {
       error: (error) => {
         console.error('Error saving fake book:', error);
         
-        // Show detailed error message to user
         let errorMessage = 'Failed to save book. ';
         if (error.error && error.error.error) {
           errorMessage += error.error.error;

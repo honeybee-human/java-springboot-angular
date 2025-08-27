@@ -140,7 +140,6 @@
   overflow: hidden;
 }
 
-// Responsive design for smaller screens
 @media (max-width: 768px) {
   .search-input-group {
     flex-direction: column;
@@ -202,7 +201,6 @@
   }
 }
 
-// MODERN BOOK CARD DESIGN
 .books-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

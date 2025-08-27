@@ -173,7 +173,7 @@
 
   &:focus {
     outline: none;
-    border-color: #28a745; // Changed from #667eea to green
+    border-color: #28a745;
   }
 }
 
@@ -182,7 +182,7 @@
 }
 
 .add-btn {
-  background: #28a745; // Changed from #667eea to green
+  background: #28a745;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -192,7 +192,7 @@
   transition: all 0.3s ease;
 
   &:hover {
-    background: #218838; // Changed from #5a6fd8 to darker green
+    background: #218838;
     transform: translateY(-2px);
   }
 }
@@ -233,7 +233,7 @@
 
   &:focus {
     outline: none;
-    border-color: #28a745; // Changed from #667eea to green
+    border-color: #28a745;
   }
 }
 
@@ -255,13 +255,13 @@
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: #28a745; // Changed from #667eea to green
-    background: #f0f8f0; // Changed from #f8f9ff to light green
+    border-color: #28a745;
+    background: #f0f8f0;
   }
 
   &.selected {
-    border-color: #28a745; // Changed from #667eea to green
-    background: #28a745; // Changed from #667eea to green
+    border-color: #28a745;
+    background: #28a745;
     color: white;
   }
 }
@@ -448,7 +448,6 @@
   }
 }
 
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -510,7 +509,6 @@
   justify-content: flex-end;
 }
 
-/* Book Selection Styles in Modal */
 .saved-books-section {
   margin-bottom: 30px;
   
@@ -648,7 +646,6 @@
   font-style: italic;
 }
 
-/* Form and Layout Improvements */
 .form-section {
   background: #f8f9fa;
   padding: 20px;

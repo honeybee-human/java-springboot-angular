@@ -25,7 +25,6 @@ public class DiaryEntry {
     @Column(name = "tag")
     private Set<String> tags;
     
-    // Add book relationship
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book associatedBook;
@@ -36,13 +35,11 @@ public class DiaryEntry {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    // Constructors
     public DiaryEntry() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
     
-    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
@@ -58,7 +55,6 @@ public class DiaryEntry {
     public Set<String> getTags() { return tags; }
     public void setTags(Set<String> tags) { this.tags = tags; }
     
-    // New book getter and setter
     public Book getAssociatedBook() { return associatedBook; }
     public void setAssociatedBook(Book associatedBook) { this.associatedBook = associatedBook; }
     

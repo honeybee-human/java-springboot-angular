@@ -1,7 +1,14 @@
 package com.diary.model;
 
-import jakarta.persistence.*;
 import java.util.List;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "books")
@@ -9,44 +16,42 @@ public class Book {
     @Id
     private String googleBooksId;
     
-    @Column(length = 1000) // Increased from default 255
+    @Column(length = 1000)
     private String title;
     
-    @Column(length = 1000) // Increased from default 255
+    @Column(length = 1000)
     private String subtitle;
     
     @ElementCollection
     @CollectionTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "author", length = 500) // Increased from default 255
+    @Column(name = "author", length = 500)
     private List<String> authors;
     
-    @Column(length = 500) // Increased from default 255
+    @Column(length = 500)
     private String publisher;
     
     private String publishedDate;
     
-    @Column(columnDefinition = "TEXT") // Allow unlimited length for descriptions
+    @Column(columnDefinition = "TEXT")
     private String description;
     
-    @Column(length = 1000) // Increased from default 255
+    @Column(length = 1000)
     private String thumbnail;
     
-    @Column(length = 1000) // Increased from default 255
+    @Column(length = 1000)
     private String previewLink;
     
     @ElementCollection
     @CollectionTable(name = "book_categories", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "category", length = 500) // Increased from default 255
+    @Column(name = "category", length = 500)
     private List<String> categories;
     
     private Double averageRating;
     private Integer ratingsCount;
     private Boolean isSaved = false;
     
-    // Constructors
     public Book() {}
     
-    // Getters and Setters
     public String getGoogleBooksId() { return googleBooksId; }
     public void setGoogleBooksId(String googleBooksId) { this.googleBooksId = googleBooksId; }
     

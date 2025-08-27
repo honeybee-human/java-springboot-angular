@@ -25,7 +25,6 @@ public interface DiaryEntryRepository extends JpaRepository<DiaryEntry, Long> {
     
     List<DiaryEntry> findAllByOrderByCreatedAtDesc();
     
-    // New methods for book-related searches
     @Query("SELECT d FROM DiaryEntry d WHERE d.associatedBook.title LIKE %:bookTitle%")
     List<DiaryEntry> findByBookTitle(@Param("bookTitle") String bookTitle);
     

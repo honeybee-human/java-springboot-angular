@@ -1,20 +1,21 @@
 package com.diary.service;
 
-import com.diary.model.Book;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.diary.model.Book;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class GoogleBooksService {
@@ -25,7 +26,6 @@ public class GoogleBooksService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     
-    // Target subjects for API queries
     private static final String[] TARGET_SUBJECTS = {
         "mindfulness", "motivation", "self-help"
     };
@@ -34,7 +34,6 @@ public class GoogleBooksService {
         try {
             List<Book> allBooks = new ArrayList<>();
             
-            // First, get books from target subjects
             for (String subject : TARGET_SUBJECTS) {
                 try {
                     String query = buildSubjectQuery(subject, titleQuery, authorQuery);
@@ -45,10 +44,8 @@ public class GoogleBooksService {
                 }
             }
             
-            // Remove duplicates
             List<Book> uniqueBooks = removeDuplicateBooks(allBooks);
             
-            // Filter by description if provided
             if (descriptionQuery != null && !descriptionQuery.trim().isEmpty()) {
                 uniqueBooks = filterBooksByDescription(uniqueBooks, descriptionQuery.trim());
             }
@@ -101,7 +98,7 @@ public class GoogleBooksService {
     
     private List<Book> fetchBooksFromAPI(String query, int page, int maxResults) {
         try {
-            maxResults = Math.max(maxResults, 10); // Minimum 10 per query
+            maxResults = Math.max(maxResults, 10);
             int startIndex = page * maxResults;
             
             String url = "https://www.googleapis.com/books/v1/volumes?q=" + query
@@ -130,7 +127,6 @@ public class GoogleBooksService {
             if (book.getDescription() != null && !book.getDescription().trim().isEmpty()) {
                 String description = book.getDescription().toLowerCase();
                 
-                // Check if description contains any of the search terms
                 boolean matches = false;
                 for (String term : searchTerms) {
                     if (description.contains(term.toLowerCase())) {
@@ -187,7 +183,6 @@ public class GoogleBooksService {
                         book.setPublishedDate(getTextValue(volumeInfo, "publishedDate"));
                         book.setDescription(getTextValue(volumeInfo, "description"));
                         
-                        // Authors
                         JsonNode authors = volumeInfo.get("authors");
                         if (authors != null && authors.isArray()) {
                             List<String> authorList = new ArrayList<>();
@@ -197,7 +192,6 @@ public class GoogleBooksService {
                             book.setAuthors(authorList);
                         }
                         
-                        // Categories
                         JsonNode categories = volumeInfo.get("categories");
                         if (categories != null && categories.isArray()) {
                             List<String> categoryList = new ArrayList<>();
@@ -207,16 +201,13 @@ public class GoogleBooksService {
                             book.setCategories(categoryList);
                         }
                         
-                        // Image
                         JsonNode imageLinks = volumeInfo.get("imageLinks");
                         if (imageLinks != null) {
                             book.setThumbnail(getTextValue(imageLinks, "thumbnail"));
                         }
                         
-                        // Preview link
                         book.setPreviewLink(getTextValue(volumeInfo, "previewLink"));
                         
-                        // Ratings
                         if (volumeInfo.has("averageRating")) {
                             book.setAverageRating(volumeInfo.get("averageRating").asDouble());
                         }
