@@ -60,9 +60,6 @@
               (keyup.enter)="searchBooks()"
               class="form-control">
           </div>
-        </div>
-        
-        <div class="search-row filter-row">
           <div class="search-field books-per-page">
             <label for="pageSize">Books per page:</label>
             <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="form-control compact">
@@ -73,12 +70,13 @@
             </select>
           </div>
           
-          <div class="search-action">
+
+        </div>
+                  <div class="search-action">
             <button class="btn btn-primary search-btn" (click)="searchBooks()" [disabled]="isSearching">
               {{isSearching ? '🔍 Searching...' : '🔍 Search'}}
             </button>
           </div>
-        </div>
       </div>
     </div>
 

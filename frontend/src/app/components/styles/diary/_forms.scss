@@ -44,10 +44,6 @@
   }
 }
 
-.mood-filter {
-  @include form-control;
-  cursor: pointer;
-}
 
 .mood-selector {
   display: grid;

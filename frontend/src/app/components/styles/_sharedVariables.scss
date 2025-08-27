@@ -86,3 +86,13 @@ $grid-min-width: 320px;
 $grid-min-width-sm: 250px;
 $grid-min-width-md: 300px;
 
+.search-row {
+  display:flex;
+  flex-direction:row;
+  gap: 1rem;
+}
+
+.search-field {
+flex: 1 1 100%;
+  width: 100%;
+}
