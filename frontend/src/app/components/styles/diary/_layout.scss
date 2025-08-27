@@ -135,6 +135,11 @@
   }
 }
 
+.advanced-search .search-action .search-btn {
+  @include button-primary;
+  white-space: nowrap;
+}
+
 .books-per-page {
   min-width: 180px;
   

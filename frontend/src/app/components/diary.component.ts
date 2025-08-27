@@ -124,7 +124,7 @@ export class DiaryComponent implements OnInit {
         next: () => {
           this.entries = this.entries.filter(e => e.id !== id);
         }
-    })
+      });
   }
 
   cancelEdit() {
