@@ -1,0 +1,25 @@
+.loading-state, .empty-state {
+  text-align: center;
+  padding: $spacing-5xl $spacing-xl;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid $primary-color;
+  border-radius: $border-radius-full;
+  animation: spin 1s linear infinite;
+  margin: 0 auto $spacing-xl;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: $spacing-xl;
+}
+
+.empty-state h3 {
+  margin: 0 0 10px 0;
+  color: #333;
+}

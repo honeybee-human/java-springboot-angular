@@ -6,7 +6,7 @@ import { FAKE_BOOKS } from '../data/fake-books.data';
 @Component({
   selector: 'app-book',
   templateUrl: './book.component.html',
-  styleUrls: ['./book.component.scss']
+  styleUrls: ['./styles/book/book.component.scss']
 })
 export class BookComponent implements OnInit {
   descriptionQuery = '';

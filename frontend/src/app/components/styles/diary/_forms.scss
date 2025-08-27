@@ -1,0 +1,99 @@
+.form-section {
+  background: $background-light;
+  padding: $spacing-xl;
+  border-radius: $border-radius-md;
+  margin-bottom: $spacing-3xl;
+}
+
+.entry-form-card {
+  background: white;
+  border-radius: $border-radius-lg;
+  padding: $spacing-3xl;
+  margin-bottom: $spacing-3xl;
+  box-shadow: $shadow-lg;
+
+  h3 {
+    margin: 0 0 25px 0;
+    color: #333;
+    font-size: $font-size-xl;
+  }
+}
+
+.form-group {
+  margin-bottom: $spacing-xl;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    font-weight: $font-weight-normal;
+    color: #333;
+  }
+}
+
+.form-control {
+  @include form-control;
+}
+
+.search-input {
+  @include form-control;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+  }
+}
+
+.mood-filter {
+  @include form-control;
+  cursor: pointer;
+}
+
+.mood-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+  
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.mood-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-lg;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    border-color: $primary-color;
+    background: $primary-light;
+  }
+
+  &.selected {
+    border-color: $primary-color;
+    background: $primary-color;
+    color: white;
+  }
+}
+
+.mood-emoji {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.mood-label {
+  font-size: 12px;
+  font-weight: $font-weight-normal;
+}
+
+.form-actions {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: 25px;
+}

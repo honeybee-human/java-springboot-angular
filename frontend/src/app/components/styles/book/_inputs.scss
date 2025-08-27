@@ -1,0 +1,8 @@
+.search-input {
+  @include input-base;
+  
+  @include mobile {
+    width: 100%;
+    min-width: unset;
+  }
+}

@@ -1,0 +1,95 @@
+.tab-btn {
+  @include button-primary;
+  flex: 1;
+  min-width: 120px;
+  
+  @include mobile {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+.search-btn {
+  @include button-primary;
+  align-self: flex-start;
+}
+
+.save-btn {
+  @include button-success;
+  flex: 1;
+  min-width: 100px;
+}
+
+.saved-btn {
+  @include button-base;
+  color: $gray-500;
+  border-color: $gray-500;
+  cursor: default;
+  opacity: 0.8;
+  flex: 1;
+  min-width: 100px;
+}
+
+.remove-btn {
+  @include button-danger;
+  flex: 1;
+  min-width: 100px;
+}
+
+.preview-btn {
+  @include button-info;
+  flex: 1;
+  min-width: 100px;
+}
+
+.cta-btn {
+  @include button-primary;
+  margin-top: $spacing-xl;
+}
+
+.page-btn {
+  @include button-base;
+  padding: 10px 14px;
+  border-color: $gray-200;
+  background: white;
+  color: $gray-600;
+  font-weight: $font-weight-semibold;
+  min-width: 44px;
+
+  &:hover:not(:disabled) {
+    border-color: $primary-color;
+    background: $primary-light;
+    color: $primary-color;
+  }
+
+  &.active {
+    background: $primary-color;
+    color: white;
+    border-color: $primary-color;
+  }
+
+  &:disabled {
+    background: $gray-100;
+    color: $gray-300;
+    border-color: $gray-200;
+    cursor: not-allowed;
+  }
+  
+  @include mobile {
+    padding: 8px 10px;
+    font-size: $font-size-sm;
+    min-width: 36px;
+  }
+  
+  @include mobile-small {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    min-width: 32px;
+  }
+}
+
+.ellipsis {
+  padding: 10px 6px;
+  color: $gray-500;
+  font-weight: $font-weight-semibold;
+}

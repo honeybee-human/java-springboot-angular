@@ -1,0 +1,138 @@
+// Button mixin
+@mixin button-base {
+  padding: $spacing-md $spacing-2xl;
+  border: 2px solid;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  font-weight: $font-weight-semibold;
+  transition: $transition-fast;
+  font-size: $font-size-base;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: white;
+  color: $primary-color;
+  border-color: $primary-color;
+  
+  &:hover:not(:disabled) {
+    background: $primary-light;
+    border-color: $primary-hover;
+    color: $primary-hover;
+  }
+  
+  &.active {
+    background: $primary-color;
+    color: white;
+    border-color: $primary-color;
+  }
+  
+  &:disabled {
+    background: $gray-100;
+    color: $gray-300;
+    border-color: $gray-200;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-success {
+  @include button-base;
+  color: $success-color;
+  border-color: $success-color;
+  background: white;
+  
+  &:hover {
+    background: $success-light;
+    border-color: $success-hover;
+  }
+}
+
+@mixin button-danger {
+  @include button-base;
+  color: $danger-color;
+  border-color: $danger-color;
+  background: white;
+  
+  &:hover {
+    background: $danger-light;
+    border-color: $danger-hover;
+  }
+}
+
+@mixin button-info {
+  @include button-base;
+  color: $info-color;
+  border-color: $info-color;
+  background: white;
+  
+  &:hover {
+    background: $info-light;
+    border-color: $info-hover;
+    text-decoration: none;
+    color: $info-hover;
+  }
+}
+
+// Input mixin
+@mixin input-base {
+  padding: $spacing-md $spacing-lg;
+  border: 2px solid $border-color;
+  border-radius: $border-radius-md;
+  font-size: $font-size-base;
+  transition: $transition-fast;
+  background: white;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+}
+
+// Card hover effect
+@mixin card-hover {
+  transition: $transition-smooth;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: $shadow-2xl;
+  }
+}
+
+// Text truncation
+@mixin text-truncate($lines: 1) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Gradient text
+@mixin gradient-text {
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// Media queries
+@mixin mobile {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin mobile-small {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}

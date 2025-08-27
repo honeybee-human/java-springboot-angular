@@ -1,0 +1,97 @@
+.diary-container {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $spacing-xl;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 10px;
+  margin-bottom: $spacing-3xl;
+  border-bottom: 2px solid $border-color;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+.search-controls {
+  margin-bottom: $spacing-3xl;
+}
+
+.search-fields {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  background: $background-light;
+  padding: $spacing-2xl;
+  border-radius: $border-radius-lg;
+  border: 1px solid $gray-200;
+}
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  label {
+    font-weight: $font-weight-semibold;
+    color: $gray-600;
+    font-size: 0.9rem;
+  }
+}
+
+.diary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-3xl;
+  gap: $spacing-xl;
+  
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.search-section {
+  display: flex;
+  gap: $spacing-lg;
+  flex: 1;
+  
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+}
+
+.entries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($grid-min-width-md, 1fr));
+  gap: $spacing-lg;
+}
+
+.saved-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($grid-min-width-sm, 1fr));
+  gap: $spacing-lg;
+  margin-bottom: $spacing-xl;
+}
+
+.book-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($grid-min-width-md, 1fr));
+  gap: $spacing-lg;
+}
+
+.book-search-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 10px;
+  margin-bottom: $spacing-xl;
+}

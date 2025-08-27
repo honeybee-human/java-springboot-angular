@@ -1,0 +1,133 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: $modal-overlay;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: $border-radius-lg;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: $shadow-xl;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xl;
+  border-bottom: 1px solid #e0e0e0;
+  
+  h3 {
+    margin: 0;
+    color: $secondary-color;
+    font-size: $font-size-xl;
+  }
+}
+
+.modal-body {
+  padding: $spacing-xl;
+}
+
+.modal-footer {
+  padding: $spacing-xl;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saved-books-section {
+  margin-bottom: $spacing-3xl;
+  
+  h4 {
+    color: $secondary-color;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.book-search-form {
+  margin-bottom: $spacing-3xl;
+  
+  h4 {
+    color: $secondary-color;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.book-results {
+  h4 {
+    color: $secondary-color;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.mini-thumbnail {
+  width: 40px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: $border-radius-xs;
+  margin-right: $spacing-md;
+}
+
+.mini-book-info {
+  flex: 1;
+  
+  .mini-title {
+    display: block;
+    font-weight: $font-weight-semibold;
+    color: #333;
+    margin-bottom: $spacing-xs;
+    font-size: 0.9rem;
+  }
+  
+  .mini-author {
+    display: block;
+    color: #666;
+    font-size: 0.8rem;
+  }
+}
+
+.result-thumbnail {
+  width: 50px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: $border-radius-xs;
+  margin-right: $spacing-lg;
+}
+
+.result-book-info {
+  flex: 1;
+  
+  h5 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 1rem;
+  }
+  
+  p {
+    margin: 4px 0;
+    color: #666;
+    font-size: $font-size-sm;
+  }
+  
+  .result-description {
+    font-style: italic;
+  }
+}
+
+.no-books {
+  text-align: center;
+  padding: $spacing-xl;
+  color: #666;
+  font-style: italic;
+}

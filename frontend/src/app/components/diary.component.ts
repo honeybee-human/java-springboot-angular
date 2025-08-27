@@ -7,7 +7,7 @@ import { BookService } from '../services/book.service';
 @Component({
   selector: 'app-diary',
   templateUrl: './diary.component.html',
-  styleUrls: ['./diary.component.scss']
+  styleUrls: ['./styles/diary/diary.component.scss']
 })
 export class DiaryComponent implements OnInit {
   entries: DiaryEntry[] = [];

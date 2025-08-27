@@ -1,0 +1,109 @@
+.book-card {
+  background: white;
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: $shadow-xl;
+  @include card-hover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $primary-color, $secondary-color, $accent-color);
+  }
+  
+  @include mobile {
+    margin: 0 10px;
+  }
+}
+
+.book-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: $background-gradient;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: auto;
+    height: 180px;
+    max-width: 120px;
+    object-fit: cover;
+    border-radius: $border-radius-sm;
+    box-shadow: $shadow-lg;
+    transition: transform $transition-fast;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.book-details {
+  padding: $spacing-2xl;
+  position: relative;
+}
+
+.book-title {
+  margin: 0 0 8px 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $gray-700;
+  line-height: $line-height-base;
+  @include text-truncate(2);
+}
+
+.book-subtitle {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  color: $gray-500;
+  font-style: italic;
+  @include text-truncate(1);
+}
+
+.book-authors {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  color: $gray-600;
+  font-weight: $font-weight-semibold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '✍️';
+    font-size: 0.8rem;
+  }
+}
+
+.book-description {
+  margin: 0 0 16px 0;
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  color: $gray-600;
+  @include text-truncate(3);
+}
+
+.book-actions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $gray-200;
+  
+  @include mobile {
+    flex-direction: column;
+    
+    .save-btn, .saved-btn, .remove-btn, .preview-btn {
+      flex: none;
+      width: 100%;
+    }
+  }
+}

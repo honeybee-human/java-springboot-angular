@@ -1,0 +1,125 @@
+.tab-btn {
+  @include button-primary;
+}
+
+.search-btn {
+  @include button-primary;
+  align-self: flex-start;
+  
+  &:disabled {
+    background: $gray-100;
+    color: $gray-300;
+    border-color: $gray-200;
+    cursor: not-allowed;
+  }
+}
+
+.add-btn {
+  @include button-solid($primary-color, $primary-hover);
+  transform: translateY(0);
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.save-btn {
+  @include button-solid($primary-color, $primary-hover);
+}
+
+.cancel-btn {
+  @include button-solid($gray-500, #5a6268);
+}
+
+.edit-btn {
+  @include button-base;
+  padding: $spacing-sm $spacing-lg;
+  background: $warning-color;
+  color: #212529;
+  border: none;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-base;
+  
+  &:hover {
+    background: $warning-hover;
+  }
+}
+
+.delete-btn {
+  @include button-base;
+  padding: $spacing-sm $spacing-lg;
+  background: $danger-color;
+  color: white;
+  border: none;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-base;
+  
+  &:hover {
+    background: $danger-hover;
+  }
+}
+
+.cta-btn {
+  @include button-primary;
+  margin-top: $spacing-xl;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  
+  &:hover {
+    color: #333;
+  }
+}
+
+// Bootstrap-style buttons
+.btn {
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-sm;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: $transition-fast;
+  
+  &.btn-primary {
+    background-color: $info-color;
+    border-color: $info-color;
+    color: white;
+    
+    &:hover {
+      background-color: $info-hover;
+    }
+  }
+  
+  &.btn-success {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: white;
+    
+    &:hover {
+      background-color: #1e7e34;
+    }
+  }
+  
+  &.btn-secondary {
+    background-color: $gray-500;
+    border-color: $gray-500;
+    color: white;
+    
+    &:hover {
+      background-color: #545b62;
+    }
+  }
+  
+  &.btn-outline-primary {
+    @include button-outline($info-color, $info-color);
+  }
+  
+  &.btn-outline-danger {
+    @include button-outline($danger-color, $danger-color);
+  }
+}

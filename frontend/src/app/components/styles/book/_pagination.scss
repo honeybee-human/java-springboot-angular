@@ -1,0 +1,45 @@
+.pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xl;
+  margin-top: $spacing-4xl;
+  padding: $spacing-3xl;
+  background: $card-gradient;
+  border-radius: $border-radius-xl;
+  border: 1px solid $gray-200;
+  
+  @include mobile-small {
+    padding: 20px 10px;
+  }
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: $gray-500;
+  text-align: center;
+  font-weight: $font-weight-normal;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  
+  @include mobile {
+    gap: 4px;
+  }
+  
+  @include mobile-small {
+    gap: 2px;
+  }
+}
+
+.pagination-loading {
+  font-size: 0.9rem;
+  color: $primary-color;
+  font-style: italic;
+  font-weight: $font-weight-normal;
+}
