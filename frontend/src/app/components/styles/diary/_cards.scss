@@ -67,9 +67,41 @@
   color: #444;
 }
 
+// Mood tags with light blue background
+.mood-tag {
+  background-color: $mood-tag-bg;
+  color: $mood-tag-color;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-full;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  display: inline-block;
+}
+
+// Entry action buttons with white backgrounds
 .entry-actions {
   display: flex;
-  gap: 10px;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  
+  .btn-edit,
+  .btn-delete {
+    background-color: white;
+    border: 1px solid $border-color;
+    color: $gray-700;
+    transition: $transition-fast;
+    
+    &:hover {
+      background-color: $gray-100;
+      border-color: $gray-400;
+    }
+  }
+  
+  .btn-delete:hover {
+    background-color: $danger-color;
+    color: white;
+    border-color: $danger-color;
+  }
 }
 
 .saved-book-item {

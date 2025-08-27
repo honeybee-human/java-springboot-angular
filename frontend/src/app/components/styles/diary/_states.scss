@@ -30,3 +30,38 @@
   margin: 0 0 10px 0;
   color: #333;
 }
+
+// Snackbar styles
+.snackbar {
+  position: fixed;
+  bottom: $spacing-xl;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: $snackbar-bg;
+  color: white;
+  padding: $spacing-md $spacing-xl;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-lg;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  
+  &.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  
+  .snackbar-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+  
+  .snackbar-icon {
+    font-size: 1.2em;
+  }
+  
+  &.success-snackbar {
+    background-color: $success-color;
+  }
+}

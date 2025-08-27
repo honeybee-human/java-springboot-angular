@@ -7,7 +7,7 @@ import { BookService } from '../services/book.service';
 @Component({
   selector: 'app-diary',
   templateUrl: './diary.component.html',
-  styleUrls: ['./styles/diary/diary.component.scss']
+  styleUrl: './styles/diary/diary.component.scss'
 })
 export class DiaryComponent implements OnInit {
   entries: DiaryEntry[] = [];
@@ -15,6 +15,11 @@ export class DiaryComponent implements OnInit {
   loading = false;
   showAddForm = false;
   editingEntry: DiaryEntry | null = null;
+  
+  // Modal and success message properties
+  showNewEntryModal: boolean = false;
+  showSuccessMessage: boolean = false;
+  successMessage: string = '';
   
   searchQuery = '';
   titleSearchQuery = '';
@@ -88,6 +93,7 @@ export class DiaryComponent implements OnInit {
             this.entries[index] = updatedEntry;
           }
           this.cancelEdit();
+          this.showSuccess('Entry updated successfully!');
         },
         error: (error) => {
           console.error('Error updating entry:', error);
@@ -98,6 +104,7 @@ export class DiaryComponent implements OnInit {
         next: (newEntry) => {
           this.entries.unshift(newEntry);
           this.cancelEdit();
+          this.showSuccess('Entry created successfully!');
         },
         error: (error) => {
           console.error('Error creating entry:', error);
@@ -128,6 +135,7 @@ export class DiaryComponent implements OnInit {
 
   cancelEdit() {
     this.showAddForm = false;
+    this.showNewEntryModal = false;
     this.editingEntry = null;
     this.currentEntry = {
       title: '',
@@ -293,5 +301,32 @@ export class DiaryComponent implements OnInit {
   selectBookFromModal(book: Book) {
     this.currentEntry.associatedBook = book;
     this.closeBookModal();
+  }
+  
+  // Modal methods
+  openNewEntryModal() {
+    this.showNewEntryModal = true;
+    this.editingEntry = null;
+    this.currentEntry = {
+      title: '',
+      content: '',
+      mood: Mood.NEUTRAL,
+      tags: []
+    };
+    this.tagsString = '';
+  }
+  
+  closeNewEntryModal() {
+    this.showNewEntryModal = false;
+    this.cancelEdit();
+  }
+  
+  // Success message method
+  showSuccess(message: string) {
+    this.successMessage = message;
+    this.showSuccessMessage = true;
+    setTimeout(() => {
+      this.showSuccessMessage = false;
+    }, 3000);
   }
 }

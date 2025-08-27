@@ -95,3 +95,55 @@
   gap: 10px;
   margin-bottom: $spacing-xl;
 }
+
+// Entries header with add button
+.entries-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  
+  .add-entry-btn {
+    padding: $spacing-md $spacing-xl;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// Form rows for side-by-side inputs
+.form-row {
+  display: flex;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  
+  .form-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}
+
+// Search input groups
+.search-input-group {
+  display: flex;
+  gap: $spacing-md;
+  flex: 1;
+  
+  .search-input {
+    flex: 1;
+  }
+  
+  .search-btn {
+    white-space: nowrap;
+    padding: 0 $spacing-xl;
+  }
+}
+
+// Books per page compact styling
+.books-per-page {
+  min-width: 180px;
+  
+  .form-control.compact {
+    width: 80px;
+    display: inline-block;
+    margin-left: $spacing-sm;
+  }
+}

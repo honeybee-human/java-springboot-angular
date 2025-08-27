@@ -2,6 +2,8 @@
 $primary-color: #28a745;
 $primary-hover: #218838;
 $primary-light: #f0f8f0;
+$mood-tag-bg: #e7f5ff;
+$mood-tag-color: #007bff;
 
 $secondary-color: #2d5a27;
 $info-color: #007bff;
@@ -10,6 +12,8 @@ $warning-color: #ffc107;
 $warning-hover: #e0a800;
 $danger-color: #dc3545;
 $danger-hover: #c82333;
+$success-color: #28a745;
+$snackbar-bg: #333;
 
 $gray-100: #f7fafc;
 $gray-200: #e2e8f0;
@@ -47,6 +51,7 @@ $spacing-4xl: 40px;
 $spacing-5xl: 60px;
 
 // Border radius
+$border-radius-xs: 4px;
 $border-radius-sm: 6px;
 $border-radius-md: 8px;
 $border-radius-lg: 12px;

@@ -24,58 +24,69 @@
   <!-- Search Tab -->
   <div *ngIf="activeTab === 'search'" class="tab-content">
     <!-- Multiple Search Fields -->
-    <div class="search-controls">
-      <div class="search-fields">
-        <!-- Description Search -->
-        <div class="search-field">
-          <label for="descriptionSearch">Search by Description:</label>
-          <input 
-            id="descriptionSearch"
-            type="text" 
-            placeholder="Search in book descriptions..." 
-            [(ngModel)]="descriptionQuery"
-            (keyup.enter)="searchBooks()"
-            class="search-input">
+    <div class="search-controls modern-search">
+      <div class="section-header">
+        <h3>🔍 Search Books</h3>
+      </div>
+      
+      <div class="search-fields-container">
+        <!-- Title and Author Row -->
+        <div class="search-row">
+          <div class="search-field">
+            <label for="titleSearch">Search by Title:</label>
+            <input 
+              id="titleSearch"
+              type="text" 
+              placeholder="Search by book title..." 
+              [(ngModel)]="titleQuery"
+              (keyup.enter)="searchBooks()"
+              class="form-control">
+          </div>
+          
+          <div class="search-field">
+            <label for="authorSearch">Search by Author:</label>
+            <input 
+              id="authorSearch"
+              type="text" 
+              placeholder="Search by author name..." 
+              [(ngModel)]="authorQuery"
+              (keyup.enter)="searchBooks()"
+              class="form-control">
+          </div>
         </div>
         
-        <!-- Title Search -->
-        <div class="search-field">
-          <label for="titleSearch">Search by Title:</label>
-          <input 
-            id="titleSearch"
-            type="text" 
-            placeholder="Search by book title..." 
-            [(ngModel)]="titleQuery"
-            (keyup.enter)="searchBooks()"
-            class="search-input">
+        <!-- Description Row -->
+        <div class="search-row">
+          <div class="search-field full-width">
+            <label for="descriptionSearch">Search by Description:</label>
+            <input 
+              id="descriptionSearch"
+              type="text" 
+              placeholder="Search in book descriptions..." 
+              [(ngModel)]="descriptionQuery"
+              (keyup.enter)="searchBooks()"
+              class="form-control">
+          </div>
         </div>
         
-        <!-- Author Search -->
-        <div class="search-field">
-          <label for="authorSearch">Search by Author:</label>
-          <input 
-            id="authorSearch"
-            type="text" 
-            placeholder="Search by author name..." 
-            [(ngModel)]="authorQuery"
-            (keyup.enter)="searchBooks()"
-            class="search-input">
+        <!-- Books per page and Search Button Row -->
+        <div class="search-row filter-row">
+          <div class="search-field books-per-page">
+            <label for="pageSize">Books per page:</label>
+            <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="form-control compact">
+              <option [value]="8">8</option>
+              <option [value]="16">16</option>
+              <option [value]="24">24</option>
+              <option [value]="40">40</option>
+            </select>
+          </div>
+          
+          <div class="search-action">
+            <button class="btn btn-primary search-btn" (click)="searchBooks()" [disabled]="isSearching">
+              {{isSearching ? '🔍 Searching...' : '🔍 Search'}}
+            </button>
+          </div>
         </div>
-        
-        <!-- Page Size Selector -->
-        <div class="page-size-selector">
-          <label for="pageSize">Books per page:</label>
-          <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-            <option [value]="8">8</option>
-            <option [value]="16">16</option>
-            <option [value]="24">24</option>
-            <option [value]="40">40</option>
-          </select>
-        </div>
-        
-        <button class="search-btn" (click)="searchBooks()" [disabled]="isSearching">
-          {{isSearching ? 'Searching...' : 'Search'}}
-        </button>
       </div>
     </div>
 
@@ -283,5 +294,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+<!-- Success Snackbar -->
+<div *ngIf="showSuccessMessage" class="snackbar success-snackbar" [class.show]="showSuccessMessage">
+  <div class="snackbar-content">
+    <span class="snackbar-icon">⭐</span>
+    <span class="snackbar-message">{{successMessage}}</span>
   </div>
 </div>

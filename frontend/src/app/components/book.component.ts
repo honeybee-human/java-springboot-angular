@@ -20,6 +20,10 @@ export class BookComponent implements OnInit {
   isLoadingCollection = false;
   hasSearched = false;
   
+  // Success message properties
+  showSuccessMessage: boolean = false;
+  successMessage: string = '';
+  
   currentPage = 1;
   pageSize = 16;
   totalResults = 0;
@@ -212,6 +216,7 @@ export class BookComponent implements OnInit {
           this.searchResults[index].isSaved = true;
         }
         
+        this.showSuccess('Book saved to collection successfully!');
         console.log('Book saved successfully:', savedBook);
       },
       error: (error) => {
@@ -321,6 +326,7 @@ export class BookComponent implements OnInit {
           this.fakeBooks[index].isSaved = true;
         }
         
+        this.showSuccess('Book saved to collection successfully!');
         console.log('Fake book saved successfully:', savedBook);
       },
       error: (error) => {
@@ -336,5 +342,14 @@ export class BookComponent implements OnInit {
         alert(errorMessage);
       }
     });
+  }
+  
+  // Success message method
+  showSuccess(message: string) {
+    this.successMessage = message;
+    this.showSuccessMessage = true;
+    setTimeout(() => {
+      this.showSuccessMessage = false;
+    }, 3000);
   }
 }
