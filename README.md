@@ -8,6 +8,7 @@ Motivational Journal is an app that lets users record diary entries associated w
 - AngularJS
 - SCSS
 - Spring Boot
+- Google Books API
 
 ### Install
 
