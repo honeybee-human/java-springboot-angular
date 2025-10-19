@@ -23,3 +23,5 @@ mvn spring-boot:run`
 ### Features
 
 Users can record moods and tags in their journal entries, and connect the entry to a book they are reading. Users can also search for books by title, author, description or category.
+
+<img width="1096" height="590" alt="ReadingJournal2" src="https://github.com/user-attachments/assets/5781f144-8127-4d7d-80de-84a548b4393f" />
